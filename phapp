@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @file
+ * Simple command class and runner.
+ */
+
+require __DIR__ . '/vendor/autoload.php';
+
+$status = (new \drunomics\Phapp\PhappApp())->run();
+exit($status);

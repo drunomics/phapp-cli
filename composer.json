@@ -1,20 +1,32 @@
 {
-    "name": "drunomics/phapp-cli",
-    "description": "Phapp cli tools.",
-    "license": "proprietary",
-    "authors": [
-        {
-            "name": "drunomics GmbH",
-            "email": "hello@drunomics.com"
-        }
-    ],
-    "require": {
-        "symfony/yaml": "~3.0",
-        "consolidation/annotated-command": "~1.2",
-        "consolidation/output-formatters": "~1.0"
-    },
-    "scripts": {
-        "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
-        "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf"
+  "name": "drunomics/phapp-cli",
+  "description": "Phapp cli tools.",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "drunomics GmbH",
+      "email": "hello@drunomics.com"
     }
+  ],
+  "require": {
+    "symfony/yaml": "~3.0",
+    "consolidation/annotated-command": "~1.2",
+    "consolidation/output-formatters": "~1.0",
+    "symfony/event-dispatcher": "~3.0"
+  },
+  "scripts": {
+    "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
+    "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf"
+  },
+  "autoload":{
+    "psr-4":{
+      "drunomics\\Phapp\\":"src"
+    }
+  },
+  "bin":["phapp"],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
+  }
 }
