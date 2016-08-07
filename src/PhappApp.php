@@ -4,6 +4,7 @@ namespace drunomics\Phapp;
 
 use Consolidation\AnnotatedCommand\AnnotatedCommandFactory;
 use Consolidation\OutputFormatters\FormatterManager;
+use drunomics\Phapp\Commands\CreateCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Main phapp cli app.
  */
-class PhappApp extends  Application {
+class PhappApp extends Application {
 
   /**
    * {@inheritdoc}
@@ -22,7 +23,7 @@ class PhappApp extends  Application {
     $commandFactory
       ->commandProcessor()
       ->setFormatterManager(new FormatterManager());
-    $commandList = $commandFactory->createCommandsFromClass(SetupCommands::class);
+    $commandList = $commandFactory->createCommandsFromClass(new CreateCommand());
     foreach ($commandList as $command) {
       // Add default-format to all commands.
       $description = 'The output format. Available formats are: json, yaml, print-r, list.';
