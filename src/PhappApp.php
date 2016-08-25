@@ -22,18 +22,33 @@ class PhappApp extends Application {
    * {@inheritdoc}
    */
   public function run(InputInterface $input = null, OutputInterface $output = null) {
-    $this->initServices();
+    $container = $this->initContainer();
+
     $commandFactory = new AnnotatedCommandFactory();
     $commandFactory
       ->commandProcessor()
       ->setFormatterManager(new FormatterManager());
-    $commandList = $commandFactory->createCommandsFromClass(new CreateCommand());
-    foreach ($commandList as $command) {
-      // Add default-format to all commands.
-      $description = 'The output format. Available formats are: json, yaml, print-r, list.';
-      $command->addOption('format', 'f', InputOption::VALUE_REQUIRED, $description, 'json');
-      $this->add($command);
+
+    $commandObjects = [
+      (new CreateCommand()),
+    ];
+
+    foreach ($commandObjects as $command) {
+      // Register service providers from commands.
+      $command->setContainer($container);
+      foreach ($command->getServiceProviders() as $provider) {
+        $container->addServiceProvider($provider);
+      }
+
+      $annotatedCommandList = $commandFactory->createCommandsFromClass($command);
+      foreach ($annotatedCommandList as $annotatedCommand) {
+        // Add default-format to all commands.
+        $description = 'The output format. Available formats are: json, yaml, print-r, list.';
+        $annotatedCommand->addOption('format', 'f', InputOption::VALUE_REQUIRED, $description, 'json');
+        $this->add($annotatedCommand);
+      }
     }
+
     $this->setName("Phapp CLI\nCopyright (C) drunomics GmbH");
     $this->setDefaultCommand('list');
     $this->setAutoExit(false);
@@ -41,9 +56,9 @@ class PhappApp extends Application {
   }
 
   /**
-   * Initializes services.
+   * Initializes the container.
    */
-  protected function initServices(InputInterface $input = null, OutputInterface $output = null) {
+  protected function initContainer(InputInterface $input = null, OutputInterface $output = null) {
     // If we were not provided a container, then create one
     if (!Robo::hasContainer()) {
       // Set up our dependency injection container.
@@ -51,6 +66,7 @@ class PhappApp extends Application {
       Runner::configureContainer($container, $input, $output);
       Robo::setContainer($container);
     }
+    return Robo::getContainer();
   }
 
 }
