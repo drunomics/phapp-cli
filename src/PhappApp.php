@@ -5,6 +5,7 @@ namespace drunomics\Phapp;
 use Consolidation\AnnotatedCommand\AnnotatedCommandFactory;
 use Consolidation\OutputFormatters\FormatterManager;
 use drunomics\Phapp\Commands\CreateCommand;
+use drunomics\Phapp\Commands\ExecCommand;
 use League\Container\Container;
 use Robo\Robo;
 use Robo\Runner;
@@ -31,6 +32,7 @@ class PhappApp extends Application {
 
     $commandObjects = [
       (new CreateCommand()),
+      (new ExecCommand()),
     ];
 
     foreach ($commandObjects as $command) {
