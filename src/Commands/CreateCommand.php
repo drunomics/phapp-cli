@@ -17,36 +17,22 @@ class CreateCommand {
   use IO;
 
   /**
-   * Clones an app.
-   *
-   * @command clone
-   */
-  public function cloneApp() {
-
-  }
-
-  /**
    * Creates a new app based on a given template.
    *
    * @command create
    */
   public function createApp($name, $template = NULL) {
-    $helper = $this->getDialog()->getHelperSet()->get('question');
-
     $question = new ChoiceQuestion(
       'Please select the app template to use:',
       ['Empty', 'Drupal 8'],
       0
     );
+
     $question->setErrorMessage('Template %s is invalid.');
-    $template = $helper->ask($this->getInput(), $this->getOutput(), $question);
-    $this->writeln('You have just selected: ' . $template);
+    $template = $this->getDialog()->ask($this->getInput(), $this->getOutput(), $question);
+    $this->say('You have just selected: ' . $template);
+
+    $this->yell('TODO: This command is unfinished.');
   }
 
-  /**
-   * Initializes a new app.
-   */
-  public function initApp() {
-
-  }
 }

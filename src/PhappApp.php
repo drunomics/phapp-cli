@@ -5,6 +5,9 @@ namespace drunomics\Phapp;
 use Consolidation\AnnotatedCommand\AnnotatedCommandFactory;
 use Consolidation\OutputFormatters\FormatterManager;
 use drunomics\Phapp\Commands\CreateCommand;
+use League\Container\Container;
+use Robo\Robo;
+use Robo\Runner;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,6 +22,7 @@ class PhappApp extends Application {
    * {@inheritdoc}
    */
   public function run(InputInterface $input = null, OutputInterface $output = null) {
+    $this->initServices();
     $commandFactory = new AnnotatedCommandFactory();
     $commandFactory
       ->commandProcessor()
@@ -34,6 +38,19 @@ class PhappApp extends Application {
     $this->setDefaultCommand('list');
     $this->setAutoExit(false);
     return parent::run();
+  }
+
+  /**
+   * Initializes services.
+   */
+  protected function initServices(InputInterface $input = null, OutputInterface $output = null) {
+    // If we were not provided a container, then create one
+    if (!Robo::hasContainer()) {
+      // Set up our dependency injection container.
+      $container = new Container();
+      Runner::configureContainer($container, $input, $output);
+      Robo::setContainer($container);
+    }
   }
 
 }
