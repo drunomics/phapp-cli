@@ -3,14 +3,20 @@
 
 /**
  * @file
- * Simple command class and runner.
+ * Simple runner file that launches the CLI tool.
+ *
+ * See https://github.com/consolidation/Robo/blob/master/docs/framework.md.
  */
 
+use Consolidation\AnnotatedCommand\CommandFileDiscovery;
 use Robo\Robo;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$commandClasses = [ \drunomics\Phapp\Commands\CreateCommand::class ];
+$discovery = new CommandFileDiscovery();
+$discovery->setSearchPattern('*Command.php');
+$commandClasses = $discovery->discover('src/Commands', '\drunomics\Phapp\Commands');
+
 $statusCode = Robo::run(
   $_SERVER['argv'],
   $commandClasses,
