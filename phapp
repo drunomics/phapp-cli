@@ -15,7 +15,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 $discovery = new CommandFileDiscovery();
 $discovery->setSearchPattern('*Command.php');
-$commandClasses = $discovery->discover('src/Commands', '\drunomics\Phapp\Commands');
+$commandClasses = $discovery->discover(__DIR__ . '/src/Commands', '\drunomics\Phapp\Commands');
 
 $statusCode = Robo::run(
   $_SERVER['argv'],

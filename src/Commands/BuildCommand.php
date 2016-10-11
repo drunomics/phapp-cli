@@ -2,19 +2,22 @@
 
 namespace drunomics\Phapp\Commands;
 
+use drunomics\Phapp\Phapp;
 use Robo\Tasks;
 
 /**
- * Class CloneCommand.
+ * Class BuildCommand.
  */
-class CloneCommand extends Tasks {
+class BuildCommand extends Tasks {
 
   /**
    * Clones an app.
    *
-   * @command clone
+   * @command build
    */
   public function execute() {
+
+    $phapp = Phapp::getInstance();
 
   }
 
