@@ -16,6 +16,18 @@ To do so, just execute:
      composer --working-dir=$INSTALL_DIR config prefer-stable true
      cgr drunomics/phapp-cli
 
+Note: The code gets placed in 
+
+  ~/.composer/global/drunomics/phapp-cli/vendor/drunomics/phapp-cli
+  
+and the "phapp" executable is added to the bin-dir automatically.
+ 
+## Updating
+
+Re-run
+      
+     cgr drunomics/phapp-cli
+     
 ## Usage
 
 Run `phapp list` to show a list of support commands. A few important commands
