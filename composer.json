@@ -10,7 +10,7 @@
   ],
   "require": {
     "symfony/yaml": "~3.0",
-    "codegyre/robo": "dev-master#1.0.0-RC1",
+    "codegyre/robo": "dev-master#e180cc705a27c3d5999dba54b0137eb3779777fe",
     "symfony/event-dispatcher": "^3.1"
   },
   "scripts": {

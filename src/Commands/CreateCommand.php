@@ -2,19 +2,13 @@
 
 namespace drunomics\Phapp\Commands;
 
-use League\Container\ContainerAwareTrait;
-use Robo\Common\IO;
-use Robo\LoadAllTasks;
+use Robo\Tasks;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * Class CreateCommand.
  */
-class CreateCommand {
-
-  use ContainerAwareTrait;
-  use LoadAllTasks;
-  use IO;
+class CreateCommand extends Tasks {
 
   /**
    * @todo: Add config.yml for basic config like this.
@@ -35,7 +29,7 @@ class CreateCommand {
    *
    * @command create
    */
-  public function createApp($name = NULL, $options = ['template' => NULL, 'template-version' => '*']) {
+  public function execute($name = NULL, $options = ['template' => NULL, 'template-version' => '*']) {
     if (!$name) {
       $name = $this->ask("App name (e.g. 'new-site'):");
     }

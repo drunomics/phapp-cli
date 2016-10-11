@@ -6,7 +6,15 @@
  * Simple command class and runner.
  */
 
+use Robo\Robo;
+
 require __DIR__ . '/vendor/autoload.php';
 
-$status = (new \drunomics\Phapp\PhappApp())->run();
-exit($status);
+$commandClasses = [ \drunomics\Phapp\Commands\CreateCommand::class ];
+$statusCode = Robo::run(
+  $_SERVER['argv'],
+  $commandClasses,
+  'phapp',
+  '0.x-dev'
+);
+exit($statusCode);

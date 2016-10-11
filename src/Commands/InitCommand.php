@@ -2,18 +2,12 @@
 
 namespace drunomics\Phapp\Commands;
 
-use League\Container\ContainerAwareTrait;
-use Robo\Common\IO;
-use Robo\LoadAllTasks;
+use Robo\Tasks;
 
 /**
  * Class CreateCommand.
  */
-class InitCommand {
-
-  use ContainerAwareTrait;
-  use LoadAllTasks;
-  use IO;
+class InitCommand extends Tasks  {
 
   /**
    * Initializes a new app.

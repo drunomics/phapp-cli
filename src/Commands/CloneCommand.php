@@ -2,26 +2,19 @@
 
 namespace drunomics\Phapp\Commands;
 
-use League\Container\ContainerAwareTrait;
-use Robo\Common\IO;
-use Robo\LoadAllTasks;
-
+use Robo\Tasks;
 
 /**
  * Class CreateCommand.
  */
-class CloneCommand {
-
-  use ContainerAwareTrait;
-  use LoadAllTasks;
-  use IO;
+class CloneCommand extends Tasks {
 
   /**
    * Clones an app.
    *
    * @command clone
    */
-  public function cloneApp() {
+  public function execute() {
 
   }
 

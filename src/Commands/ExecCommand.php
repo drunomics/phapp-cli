@@ -2,20 +2,12 @@
 
 namespace drunomics\Phapp\Commands;
 
-use League\Container\ContainerAwareTrait;
-use Robo\Common\IO;
-use Robo\LoadAllTasks;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+use Robo\Tasks;
 
 /**
  * Class ExecCommand.
  */
-class ExecCommand {
-
-  use ContainerAwareTrait;
-  use LoadAllTasks;
-  use IO;
-
+class ExecCommand extends Tasks {
 
   /**
    * Executes commands based on the environment.
