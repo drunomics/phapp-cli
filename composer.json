@@ -10,8 +10,8 @@
   ],
   "require": {
     "symfony/yaml": "~3.0",
-    "codegyre/robo": "dev-master#e180cc705a27c3d5999dba54b0137eb3779777fe",
-    "symfony/event-dispatcher": "^3.1"
+    "symfony/event-dispatcher": "^3.1",
+    "consolidation/robo": "^1.0"
   },
   "scripts": {
     "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
