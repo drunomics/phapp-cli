@@ -13,7 +13,7 @@ To do so, just execute:
      mkdir -p $INSTALL_DIR && echo "{}" > $INSTALL_DIR/composer.json
      composer --working-dir=$INSTALL_DIR config minimum-stability dev
      composer --working-dir=$INSTALL_DIR config prefer-stable true
-     cgr drunomics/phapp-cli
+     ~/.composer/vendor/bin/cgr drunomics/phapp-cli
 
 Note: The code gets placed in 
 
