@@ -1,17 +1,16 @@
 # Phapp CLI tool
 
-The Phapp CLI tool is
+Provides standardized console commands for PHP applications.
 
 ## Installation
 
 Installation requires composer. As there are some dependency conflicts with the
-latest drush release it is recommened to install the tool via consolidation/cgr.
+latest drush release it is recommended to install the tool via consolidation/cgr.
 To do so, just execute:
 
      composer global require consolidation/cgr
      export INSTALL_DIR=$HOME/.composer/global/drunomics/phapp-cli
      mkdir -p $INSTALL_DIR && echo "{}" > $INSTALL_DIR/composer.json
-     composer --working-dir=$INSTALL_DIR config repositories.drunomics composer https://packages.drunomics.com
      composer --working-dir=$INSTALL_DIR config minimum-stability dev
      composer --working-dir=$INSTALL_DIR config prefer-stable true
      cgr drunomics/phapp-cli
@@ -20,7 +19,9 @@ Note: The code gets placed in
 
   ~/.composer/global/drunomics/phapp-cli/vendor/drunomics/phapp-cli
   
-and the "phapp" executable is added to the bin-dir automatically.
+and the "phapp" executable is added to the bin-dir (~/.composer/vendor/bin)
+automatically. If not done yet, Make sure ~/.composer/vendor/bin is in your
+PATH.
  
 ## Updating
 

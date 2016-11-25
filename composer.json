@@ -1,7 +1,7 @@
 {
   "name": "drunomics/phapp-cli",
-  "description": "Phapp cli tools.",
-  "license": "proprietary",
+  "description": "Provides standardized console commands for PHP applications.",
+  "license": "MIT",
   "authors": [
     {
       "name": "drunomics GmbH",
