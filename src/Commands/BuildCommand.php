@@ -163,7 +163,7 @@ class BuildCommand extends Tasks {
     $commit_hash = trim($commit_hash);
 
     $task = $this->taskGitStack()
-      ->exec("add '.'")
+      ->exec("add -A")
       // Note that git commit uses ' already, so we remove ours. Also, we allow
       // empty commits in case no assets were changed the merge might be enough.
       ->commit(sprintf("Build %s commit %s.", trim($branch, '\''), trim($commit_hash, '\'')), '--allow-empty');
