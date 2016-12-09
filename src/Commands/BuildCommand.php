@@ -5,6 +5,7 @@ namespace drunomics\Phapp\Commands;
 use drunomics\Phapp\Phapp;
 use Robo\Tasks;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Class BuildCommand.
@@ -67,6 +68,29 @@ class BuildCommand extends Tasks {
 
     $collection->addTaskToCollection(
       $this->taskExec($this->phapp->getCommand('build'))
+    );
+
+    // Avoid problems with git submodules.
+    $collection->addCode(
+      function() {
+        $finder = new Finder();
+        $directories = $finder->directories()
+          ->name('.git')
+          ->ignoreVCS(FALSE)
+          ->ignoreDotFiles(FALSE)
+          ->in(getcwd());
+
+        $dirs = [];
+        foreach ($directories as $dir) {
+          if ($dir->getRelativePath() != '') {
+            $dirs[] = $dir->getPathname();
+          }
+        }
+        if ($dirs) {
+          $this->say("Removing .git directories to avoid troubles with git submodules");
+          $this->taskDeleteDir($dirs)->run();
+        }
+      }
     );
 
     return $collection;
