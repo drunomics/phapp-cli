@@ -31,9 +31,10 @@ class Phapp {
    *
    * @var array
    */
-  protected $configDefaults = [
+  static protected $configDefaults = [
+    'composer-bin' => 'composer',
     'commands' => [
-      'build' => 'composer install'
+      'build' => 'composer install',
     ],
   ];
 
@@ -92,7 +93,7 @@ class Phapp {
    *   The config file info.
    */
   public function __construct(array $config, SplFileInfo $configFile) {
-    $this->config = $config;
+    $this->config = array_replace_recursive(static::$configDefaults, $config);
     $this->configFile = $configFile;
   }
 
@@ -118,22 +119,26 @@ class Phapp {
   }
 
   /**
+   * Gets the command for running composer. Usually "composer".
+   *
+   * @return string
+   */
+  public function getComposerBin() {
+    return $this->config['composer-bin'];
+  }
+
+  /**
    * Gets the bash string configured for a given command.
    *
    * @param string $name
    *   The name of the command; e.g. 'build' or 'deploy'.
-   * @param bool $fallback
-   *   Whether to fallback to the default value if one is available.
    *
    * @return string|null
    *   The configured command string.
    */
-  public function getCommand($name, $fallback = TRUE) {
+  public function getCommand($name) {
     if (isset($this->config['commands'][$name])) {
       return $this->config['commands'][$name];
-    }
-    if ($fallback && isset($this->configDefaults['commands'][$name])) {
-      return $this->configDefaults['commands'][$name];
     }
     return NULL;
   }

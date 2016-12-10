@@ -6,6 +6,7 @@ use drunomics\Phapp\Phapp;
 use Robo\Tasks;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class BuildCommand.
@@ -23,6 +24,7 @@ class BuildCommand extends Tasks {
    * Ensures with a valid phapp instance to interact with.
    *
    * @hook validate build
+   * @hook validate build:clean
    */
   public function initPhapp() {
     $this->phapp = Phapp::getInstance();
@@ -30,7 +32,7 @@ class BuildCommand extends Tasks {
   }
 
   /**
-   * Builds the complete project.
+   * Builds the app.
    *
    * If no branch is given, the currently checked out code is going to be built.
    *
@@ -233,4 +235,44 @@ class BuildCommand extends Tasks {
     return $collection;
   }
 
+  /**
+   * Cleans all build related files.
+   *
+   * Removes all dependencies that are installed via composer.
+   *
+   * @command build:clean
+   */
+  public function clean() {
+    $composer = $this->phapp->getComposerBin();
+    $process = new Process("$composer show --path");
+    $process->run();
+
+    if (!$process->isSuccessful()) {
+      throw new \Exception("Errors while running $composer." . $process->getErrorOutput());
+    }
+
+    $dirs = [];
+    foreach (explode("\n", $process->getOutput()) as $line) {
+      $matches = [];
+      // Parse out the path from the output. The path is the second "word",
+      // after the package and some whitespace.
+      if (preg_match('/\S*\s*(\S*)/', $line, $matches)) {
+        $dirs[] = $matches[1];
+      }
+    }
+    // Remove dirs which are sub-directories of the vendor dirs and delete that
+    // instead.
+    $vendor_dir = realpath('./vendor');
+    $dirs = array_filter($dirs, function($dir) use ($vendor_dir) {
+      return $dir && strpos($dir, $vendor_dir) !== 0;
+    });
+    $dirs[] = $vendor_dir;
+
+    // Cut of the current directory and use relative paths.
+    $cwd = realpath(getcwd());
+    foreach ($dirs as &$dir) {
+      $dir = str_replace($cwd . '/', '', $dir);
+    }
+    return $this->taskDeleteDir($dirs);
+  }
 }
