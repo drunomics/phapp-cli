@@ -23,8 +23,7 @@ class BuildCommand extends Tasks {
   /**
    * Ensures with a valid phapp instance to interact with.
    *
-   * @hook validate build
-   * @hook validate build:clean
+   * @hook validate
    */
   public function initPhapp() {
     $this->phapp = Phapp::getInstance();
@@ -40,14 +39,16 @@ class BuildCommand extends Tasks {
    *   If given, the branch will be checked out, built, and the build
    *   is going to be committed to the respective build branch "build/{BRANCH}".
    *
-   * @option $auto-tag-prefix A prefix of Git tags to automtatically tag builds
+   * @option $auto-tag-prefix A prefix of Git tags to automatically tag builds
    *   with. Only applicable if a branch is given.
+   * @option $clean Allows starting the build from a clean state. If specified,
+   *   any previously installed composer dependencies are removed.
    *
    * @return \Robo\Collection\Collection
    *
    * @command build
    */
-  public function build($branch = NULL, $options = ['auto-tag-prefix' => 'version']) {
+  public function build($branch = NULL, $options = ['auto-tag-prefix' => 'version', 'clean' => FALSE]) {
     if ($branch) {
       return $this->buildAndCommit($branch, $options);
     }
@@ -67,6 +68,10 @@ class BuildCommand extends Tasks {
    */
   protected function doBuild($options) {
     $collection = $this->collectionBuilder();
+
+    if ($options['clean']) {
+      $collection->addTask($this->clean());
+    }
 
     $collection->addTaskToCollection(
       $this->taskExec($this->phapp->getCommand('build'))
