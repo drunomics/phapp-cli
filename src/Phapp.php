@@ -33,6 +33,14 @@ class Phapp {
    */
   static protected $configDefaults = [
     'composer-bin' => 'composer',
+    'git' => [
+      'url' => '',
+      'mirrors' => [],
+      'branches' => [
+        'production' => 'master',
+        'develop' => 'develop',
+      ],
+    ],
     'commands' => [
       'build' => 'composer install',
     ],
@@ -141,6 +149,42 @@ class Phapp {
       return $this->config['commands'][$name];
     }
     return NULL;
+  }
+
+  /**
+   * Gets the Git repository URL.
+   *
+   * @return string
+   */
+  public function getGitUrl() {
+    return $this->config['git']['url'];
+  }
+
+  /**
+   * Gets the URLs of all Git repository mirrors, if any.
+   *
+   * @return string[]
+   */
+  public function getGitMirrors() {
+    return $this->config['git']['mirrors'];
+  }
+
+  /**
+   * Gets the name of the production branch, usually 'master'.
+   *
+   * @return string
+   */
+  public function getGitBranchProduction() {
+    return $this->config['git']['branches']['production'];
+  }
+
+  /**
+   * Gets the name of the develop branch, usually 'develop'.
+   *
+   * @return string
+   */
+  public function getGetBranchDevelop() {
+    return $this->config['git']['branches']['develop'];
   }
 
 }
