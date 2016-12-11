@@ -116,7 +116,6 @@ class BuildCommand extends Tasks {
     // red warnings when we do not want it to AND it stops on fails!
     // Because of that we execute the command directly with the symfony process
     // helper.
-    // @todo: Figure out who to supress that and re-use taskExec() then.
     $process = new \Symfony\Component\Process\Process($command);
     $process->run();
     return $process;
@@ -156,19 +155,37 @@ class BuildCommand extends Tasks {
     $branch_exists = $this->_execSilent("git branch --list $buildBranch | grep $buildBranch")->getExitCode() == 0;
 
     if ($branch_exists) {
-      $collection->addTask(
-        $this->taskGitStack()
-          ->checkout($buildBranch)
-          ->exec('reset --hard')
-          ->merge($branch)
-      );
+      // Update the build branch.
+      $task = $this->taskGitStack()
+        ->checkout($buildBranch)
+        ->exec('reset --hard');
+      // Only pull from the remote if the remote branch exists.
+      $remote = $this->phapp->getGitUrl() ?: 'origin';
+      if ($this->_execSilent("git fetch $remote && git branch -r --contains $buildBranch")->getOutput()) {
+        $task->pull($remote, $buildBranch);
+      }
+      $task->merge($branch);
+      $collection->addTask($task);
     }
     else {
-      $collection->addTask(
-        $this->taskGitStack()
-          ->exec("checkout -b $buildBranch")
-          ->exec('reset --hard')
-      );
+      $sourceBranch = $this->determineBuildBranchSource($branch, $buildBranch);
+      $collection->addCode(function() use ($sourceBranch) {
+        $this->say("Creating a new build branch based upon <info>$sourceBranch</info>");
+      });
+      // Update the source branch.
+      $task = $this->taskGitStack()
+        ->checkout($sourceBranch)
+        ->exec('reset --hard');
+      // Only pull if the remote branch exists.
+      $remote = $this->phapp->getGitUrl() ?: 'origin';
+      if ($this->_execSilent("git fetch $remote && git branch -r --contains $sourceBranch")->getOutput()) {
+        $task->pull($remote, $sourceBranch);
+      }
+      // Create the build branch and merge in changes.
+      $task
+        ->exec("checkout -b $buildBranch")
+        ->merge($branch);
+      $collection->addTask($task);
     }
 
     // Handle .gitignore.
@@ -203,7 +220,7 @@ class BuildCommand extends Tasks {
 
     $collection->completionCode(
       function() use ($buildBranch) {
-        $this->say("Committed build to branch $buildBranch.");
+        $this->yell("Committed build to branch $buildBranch.");
       }
     );
 
@@ -211,7 +228,7 @@ class BuildCommand extends Tasks {
     $tag = FALSE;
     if ($options['auto-tag-prefix']) {
       $prefix = escapeshellarg($options['auto-tag-prefix']);
-      $result = $this->_execSilent("git tag --points-at $branch | grep $prefix", FALSE);
+      $result = $this->_execSilent("git tag --points-at $branch | grep $prefix");
       if ($result->getExitCode() == 0) {
         $tag = $result->getOutput();
       }
@@ -219,16 +236,28 @@ class BuildCommand extends Tasks {
 
     if ($tag) {
       $target_tag = "build/$tag";
-      $collection->addTask(
-        $this->taskGitStack()
-          ->tag($target_tag)
-      );
 
-      $collection->completionCode(
-        function() use ($target_tag) {
-          $this->say("Tagged build as $target_tag");
-        }
-      );
+      // Ensure the target tag is not already existing (e.g. if building the
+      // same commit multiple times).
+      $process = $this->_execSilent("git show -q $target_tag");
+      if (!$process->isSuccessful()) {
+        $collection->addTask(
+          $this->taskGitStack()
+            ->tag($target_tag)
+        );
+        $collection->completionCode(
+          function() use ($target_tag) {
+            $this->say("Tagged build as $target_tag");
+          }
+        );
+      }
+      else {
+        $collection->completionCode(
+          function() use ($target_tag) {
+            $this->io()->warning("Tag $target_tag already exists - the tag remains unchanged.");
+          }
+        );
+      }
     }
 
     // Restore .gitignore and previous branch.
@@ -238,6 +267,57 @@ class BuildCommand extends Tasks {
         ->checkout($previous_branch)
     );
     return $collection;
+  }
+
+  /**
+   * Determines the source branch for the new build branch.
+   *
+   * @param string $branch
+   *   The to be built branch.
+   *
+   * @return string
+   */
+  protected function determineBuildBranchSource($branch) {
+    // Check whether the latest build of the production branch is something we
+    // can start from with.
+    $productionBranch = $this->phapp->getGitBranchProduction();
+    $productionBuildBranch = 'build/' . $productionBranch;
+    $process = $this->_execSilent("git log --format=oneline $productionBuildBranch --grep \"Build $productionBranch commit \"");
+
+    if ($process->isSuccessful() && $output = $process->getOutput()) {
+      // Parse the message to get the source commit hash.
+      list($first_line) = explode("\n", $output, 2);
+      $matches = [];
+      if (preg_match('/Build ' . $productionBranch . ' commit (\S*)./', $first_line, $matches)) {
+        $sourceCommit = $matches[1];
+      }
+    }
+
+    // If the source commit of the last build has been found, verify the
+    // to-be-built branch is based upon it. Else, we need to start a new build
+    // branch.
+    if (!empty($sourceCommit)) {
+      $process = $this->_execSilent("git log --format=oneline $sourceCommit..$branch");
+      $sourceIsParent = $process->isSuccessful() && $process->getOutput() != '';
+
+      if ($sourceIsParent) {
+        return $productionBuildBranch;
+      }
+
+      // Check whether the source commit is the same as to-be-built commit.
+      $process = $this->_execSilent("git reflog $sourceCommit");
+      $hash1 = $process->isSuccessful() ? $process->getOutput() : FALSE;
+      $process = $this->_execSilent("git reflog $branch");
+      $hash2 = $process->isSuccessful() ? $process->getOutput() : FALSE;
+      if ($hash1 && $hash2 && $hash1 == $hash2) {
+        return $productionBuildBranch;
+      }
+    }
+
+    // No relationship between the to-be-built and the last built commit could
+    // be found. Thus, start a new build branch based upon the to-be-built
+    // branch.
+    return $branch;
   }
 
   /**
