@@ -14,6 +14,7 @@
     "consolidation/robo": "^1.0"
   },
   "scripts": {
+    "build": "php -d phar.readonly=0 vendor/bin/box build",
     "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
     "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf",
     "post-install-cmd": "drunomics\\Phapp\\ScriptHandler::installPharTools",

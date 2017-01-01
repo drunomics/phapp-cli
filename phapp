@@ -28,6 +28,6 @@ $statusCode = Robo::run(
   $_SERVER['argv'],
   $commandClasses,
   'phapp',
-  '0.x-dev'
+  '@package_version@'
 );
 exit($statusCode);
