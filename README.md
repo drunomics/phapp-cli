@@ -62,3 +62,5 @@ https://github.com/box-project/box2. To built the phar just run:
 * Tag a new version and push it.
 * Build a new phar (see above).
 * Upload the new phar at the github release page. Keep the filename as is.
+* Note that the packagist API is not updated immediately. Thus it takes a few
+  minutes until the new release is picked up by the self:update command.
