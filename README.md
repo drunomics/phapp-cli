@@ -1,4 +1,4 @@
-# Phapp CLI tool
+# Phapp CLI
 
 Provides standardized console commands for PHP applications.
 
@@ -8,26 +8,26 @@ Installation requires composer. As there are some dependency conflicts with the
 latest drush release it is recommended to install the tool via consolidation/cgr.
 To do so, just execute:
 
-     composer global require consolidation/cgr
-     export INSTALL_DIR=$HOME/.composer/global/drunomics/phapp-cli
-     mkdir -p $INSTALL_DIR && echo "{}" > $INSTALL_DIR/composer.json
-     composer --working-dir=$INSTALL_DIR config minimum-stability dev
-     composer --working-dir=$INSTALL_DIR config prefer-stable true
-     ~/.composer/vendor/bin/cgr drunomics/phapp-cli
-
-Note: The code gets placed in 
-
-  ~/.composer/global/drunomics/phapp-cli/vendor/drunomics/phapp-cli
-  
-and the "phapp" executable is added to the bin-dir (~/.composer/vendor/bin)
-automatically. If not done yet, Make sure ~/.composer/vendor/bin is in your
-PATH.
+    # Download latest stable release.
+    php -r "
+      ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
+      readfile(json_decode(file_get_contents('https://api.github.com/repos/drunomics/phapp-cli/releases/latest'))->assets[0]->browser_download_url);
+    " > phapp
+    chmod +x phapp
+    
+    # Optional: Ensure ~/bin exists and configure it to be available in $PATH.
+    [ -d ~/bin ] || mkdir ~/bin
+    echo $PATH | grep -q ~/bin || (echo "export PATH=~/bin:\$PATH" >> ~/.bashrc && export PATH=~/bin:$PATH)
+    
+    # Make phapp executable from everywhere by moving to a destination available in $PATH.
+    # If you skipped the optional step above, be sure to move it to a suiting destination.
+    mv phapp ~/bin/phapp
  
 ## Updating
 
-Re-run
+Run
       
-     cgr drunomics/phapp-cli
+     phapp self:update
      
 ## Usage
 
@@ -47,7 +47,7 @@ are highlighted below:
   
         phapp build {{ branch }}
 
-## Development
+## Phapp development
 
 ### Build a new phar
 
@@ -56,3 +56,9 @@ https://github.com/box-project/box2. To built the phar just run:
 
      composer install --dev
      composer build
+
+### Create a new release
+
+* Tag a new version and push it.
+* Build a new phar (see above).
+* Upload the new phar at the github release page. Keep the filename as is.
