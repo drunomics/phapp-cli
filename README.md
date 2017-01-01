@@ -46,3 +46,13 @@ are highlighted below:
   - Build a certain branch and commit the build result in `build/{{ branch }}`:
   
         phapp build {{ branch }}
+
+## Development
+
+### Build a new phar
+
+The phar is built using box, for details see
+https://github.com/box-project/box2. To built the phar just run:
+
+     composer install --dev
+     composer build
