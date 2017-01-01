@@ -15,7 +15,9 @@
   },
   "scripts": {
     "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
-    "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf"
+    "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf",
+    "post-install-cmd": "drunomics\\Phapp\\ScriptHandler::installPharTools",
+    "post-update-cmd": "drunomics\\Phapp\\ScriptHandler::installPharTools"
   },
   "autoload":{
     "psr-4":{
@@ -26,6 +28,14 @@
   "extra": {
     "branch-alias": {
       "dev-master": "1.x-dev"
+    },
+    "tools": {
+      "box": {
+        "url": "https://github.com/box-project/box2/releases/download/2.7.5/box-2.7.5.phar"
+      }
     }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
