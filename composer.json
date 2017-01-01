@@ -9,9 +9,10 @@
     }
   ],
   "require": {
-    "symfony/yaml": "~3.0",
+    "consolidation/robo": "^1.0",
+    "padraic/phar-updater": "^1.0",
     "symfony/event-dispatcher": "^3.1",
-    "consolidation/robo": "^1.0"
+    "symfony/yaml": "~3.0"
   },
   "scripts": {
     "build": "php -d phar.readonly=0 vendor/bin/box build",
