@@ -22,13 +22,6 @@ class BuildCommand extends Tasks {
   protected $phappDefinition;
 
   /**
-   * The global config.
-   *
-   * @var GlobalConfig
-   */
-  protected $globalConfig;
-
-  /**
    * Ensures with a valid phapp definition to interact with.
    *
    * @hook validate

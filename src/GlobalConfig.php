@@ -74,4 +74,53 @@ class GlobalConfig {
     return $this->config['command_bin']['composer'];
   }
 
+  /**
+   * Gets defaults for new phapp definition files (phapp.yml)
+   *
+   * @return mixed[]
+   */
+  public function getPhappDefinitionDefaults() {
+    return $this->config['phapp_init_defaults'];
+  }
+
+  /**
+   * Gets the URL for an extra composer package repository, if any.
+   *
+   * @return string|null
+   */
+  public function getComposerRepository() {
+    return $this->config['phapp_discovery']['composer_repository'];
+  }
+
+  /**
+   * Gets the default pattern for Git repository URLs of phapps.
+   *
+   * May containthe replacement token {{ phapp_name }}.
+   *
+   * @return string
+   */
+  public function getGitUrlPattern() {
+    return $this->config['phapp_discovery']['git_url_pattern'];
+  }
+
+  /**
+   * Gets the default package vendor.
+   *
+   * @return string
+   */
+  public function getDefaultPackageVendor() {
+    return $this->config['phapp_discovery']['package_vendor_default'];
+  }
+
+  /**
+   * Gets the array of phapp template packages.
+   *
+   * @return string[]
+   *   An array with the package names as keys and a human readable description
+   *   as value.
+   */
+  public function getPhappTemplatePackages() {
+    return $this->config['phapp_templates'];
+  }
+
 }

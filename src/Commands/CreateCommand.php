@@ -2,6 +2,7 @@
 
 namespace drunomics\Phapp\Commands;
 
+use drunomics\Phapp\GlobalConfig;
 use Robo\Tasks;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -11,14 +12,20 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 class CreateCommand extends Tasks {
 
   /**
-   * @todo: Add config.yml for basic config like this.
+   * The global config.
    *
-   * @var array
+   * @var GlobalConfig
    */
-  protected $templates = [
-    'drunomics/php-project' => 'drunomics/php-project (PHP or any web project - TODO)',
-    'drunomics/drupal-project' => 'drunomics/drupal-project (Drupal 8)'
-  ];
+  protected $globalConfig;
+
+  /**
+   * Ensures with a valid phapp definition to interact with.
+   *
+   * @hook validate
+   */
+  public function initPhapp() {
+    $this->globalConfig = GlobalConfig::discoverConfig();
+  }
 
   /**
    * Creates a new app based on a given template.
@@ -30,27 +37,38 @@ class CreateCommand extends Tasks {
    * @command create
    */
   public function execute($name = NULL, $options = ['template' => NULL, 'template-version' => '*']) {
+    $this->stopOnFail(TRUE);
+    $this->initPhapp();
     if (!$name) {
-      $name = $this->ask("App name (e.g. 'new-site'):");
+      $name = $this->ask("Phapp name (e.g. 'new-app'):");
     }
 
     if (empty($options['template'])) {
-      $question = new ChoiceQuestion('Please select the app template to use:', array_values($this->templates), 1);
+      $choices = [];
+      foreach ($this->globalConfig->getPhappTemplatePackages() as $package => $description) {
+        $choices[$package] = "$package - $description";
+      }
+      $question = new ChoiceQuestion('Please select the app template to use:', array_values($choices), 1);
 
       $question->setErrorMessage('Answer %s is invalid.');
       $answer = $this->getDialog()
         ->ask($this->input(), $this->output(), $question);
-      $template = array_search($answer, $this->templates);
+      $template = array_search($answer, $choices);
     }
     else {
       $template = $options['template'];
     }
 
-    $this->_exec("composer create-project $template:{$options['template-version']} --repository='https://packages.drunomics.com' $name");
+    if ($package_repository = $this->globalConfig->getComposerRepository()) {
+      $args = " --repository='$package_repository'";
+    }
+    else {
+      $args = '';
+    }
+    $this->_exec("composer create-project $template:{$options['template-version']} $args $name");
 
-    $repository_url_pattern = "git@bitbucket.org:drunomics/{{ app_name }}.git";
-    $repository_url = str_replace('{{ app_name }}', $name, $repository_url_pattern);
-    if ($this->confirm("Should the repostiory $repository_url be configured?")) {
+    $repository_url = str_replace('{{ phapp_name }}', $name, $this->globalConfig->getGitUrlPattern());
+    if ($this->confirm("Should a new Git repository be initialized and pointed to $repository_url?")) {
       $this->_exec("cd $name &&
                 git init &&
                 git remote add origin $repository_url &&
