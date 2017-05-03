@@ -2,6 +2,10 @@
 
 Provides standardized console commands for PHP applications.
 
+## Requirements
+
+ * Git version >= 2.0
+
 ## Installation
 
 Installation requires composer. As there are some dependency conflicts with the
