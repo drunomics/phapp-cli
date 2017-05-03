@@ -48,7 +48,8 @@ class SelfCommand extends Tasks {
    */
   public function rollback() {
     $updater = new Updater();
-    if ($result = $updater->rollback()) {        // Phar cannot load more classes after the update has occurred. So to
+    if ($result = $updater->rollback()) {
+      // Phar cannot load more classes after the update has occurred. So to
       // avoid errors from classes loaded after this (e.g.
       // ConsoleTerminateEvent), we exit directly now.
       $this->say("Application rolled back to version " . $updater->getOldVersion());
