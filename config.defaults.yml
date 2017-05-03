@@ -1,0 +1,18 @@
+# Configuration defaults for phapp-cli.
+---
+# Various paths to binaries used.
+command_bin:
+  composer: composer
+# Defaults applied when initializing a new phapp.yml definition.
+phapp_init_defaults: {}
+phapp_discovery:
+  # A composer repository used for finding packages like phapp templates or
+  # projects
+  composer_repository: https://packages.drunomics.com
+  # The URL pattern used for finding projects or when creating projects.
+  git_url_pattern: git@bitbucket.org:drunomics/{{ phapp_name }}.git
+  # The default vendor used for finding or creating projects.
+  vendor_default: drunomics
+phapp_templates:
+  'drunomics/php-project': 'PHP or any web project'
+  'drunomics/drupal-project': 'Drupal 8 (drunomics)'

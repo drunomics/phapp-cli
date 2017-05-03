@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Provides information about a local phapp instance.
  */
-class Phapp {
+class PhappDefinition {
 
   /**
    * The config file.
@@ -42,7 +42,7 @@ class Phapp {
       ],
     ],
     'commands' => [
-      'build' => 'composer install',
+      'build' => 'composer install --no-interaction',
     ],
   ];
 
@@ -124,15 +124,6 @@ class Phapp {
    */
   public function getConfigFile() {
     return $this->configFile;
-  }
-
-  /**
-   * Gets the command for running composer. Usually "composer".
-   *
-   * @return string
-   */
-  public function getComposerBin() {
-    return $this->config['composer-bin'];
   }
 
   /**

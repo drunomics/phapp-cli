@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains drunomics\Phapp\Exception\PhappInstanceNotFound.
+ * Contains drunomics\PhappDefinition\Exception\PhappInstanceNotFound.
  */
 
 namespace drunomics\Phapp\Exception;

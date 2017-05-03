@@ -39,7 +39,7 @@ class CreateCommand extends Tasks {
 
       $question->setErrorMessage('Answer %s is invalid.');
       $answer = $this->getDialog()
-        ->ask($this->getInput(), $this->getOutput(), $question);
+        ->ask($this->input(), $this->output(), $question);
       $template = array_search($answer, $this->templates);
     }
     else {

@@ -1,4 +1,4 @@
-# Phapp CLI
+# PhappDefinition CLI
 
 Provides standardized console commands for PHP applications.
 
@@ -51,7 +51,7 @@ are highlighted below:
   
         phapp build {{ branch }}
 
-## Phapp development
+## PhappDefinition development
 
 ### Build a new phar
 
