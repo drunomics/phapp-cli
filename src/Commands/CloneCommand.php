@@ -2,12 +2,12 @@
 
 namespace drunomics\Phapp\Commands;
 
-use Robo\Tasks;
+use drunomics\Phapp\PhappCommandBase;
 
 /**
  * Class CloneCommand.
  */
-class CloneCommand extends Tasks {
+class CloneCommand extends PhappCommandBase {
 
   /**
    * Clones an app.

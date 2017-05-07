@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Provides information about a local phapp instance.
  */
-class PhappDefinition {
+class PhappManifest {
 
   /**
    * The config file.
@@ -174,7 +174,7 @@ class PhappDefinition {
    *
    * @return string
    */
-  public function getGetBranchDevelop() {
+  public function getGitBranchDevelop() {
     return $this->config['git']['branches']['develop'];
   }
 

@@ -2,9 +2,7 @@
 
 namespace drunomics\Phapp\Commands;
 
-use drunomics\Phapp\GlobalConfig;
-use drunomics\Phapp\PhappDefinition;
-use Robo\Tasks;
+use drunomics\Phapp\PhappCommandBase;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -12,25 +10,7 @@ use Symfony\Component\Process\Process;
 /**
  * Class BuildCommand.
  */
-class BuildCommand extends Tasks {
-
-  /**
-   * The current phapp instance.
-   *
-   * @var PhappDefinition
-   */
-  protected $phappDefinition;
-
-  /**
-   * Ensures with a valid phapp definition to interact with.
-   *
-   * @hook validate
-   */
-  public function initPhapp() {
-    $this->phappDefinition = PhappDefinition::getInstance();
-    $this->phappDefinition->initShellEnvironment();
-    $this->globalConfig = GlobalConfig::discoverConfig();
-  }
+class BuildCommand extends PhappCommandBase {
 
   /**
    * Builds the app.
@@ -76,7 +56,7 @@ class BuildCommand extends Tasks {
     }
 
     $collection->addTaskToCollection(
-      $this->taskExec($this->phappDefinition->getCommand('build'))
+      $this->taskExec($this->phappManifest->getCommand('build'))
     );
 
     // Avoid problems with git submodules.
@@ -162,7 +142,7 @@ class BuildCommand extends Tasks {
         ->checkout($buildBranch)
         ->exec('reset --hard');
       // Only pull from the remote if the remote branch exists.
-      $remote = $this->phappDefinition->getGitUrl() ?: 'origin';
+      $remote = $this->phappManifest->getGitUrl() ?: 'origin';
       if ($this->_execSilent("git fetch $remote && git branch -r --contains $buildBranch")->getOutput()) {
         $task->pull($remote, $buildBranch);
       }
@@ -179,7 +159,7 @@ class BuildCommand extends Tasks {
         ->checkout($sourceBranch)
         ->exec('reset --hard');
       // Only pull if the remote branch exists.
-      $remote = $this->phappDefinition->getGitUrl() ?: 'origin';
+      $remote = $this->phappManifest->getGitUrl() ?: 'origin';
       if ($this->_execSilent("git fetch $remote && git branch -r --contains $sourceBranch")->getOutput()) {
         $task->pull($remote, $sourceBranch);
       }
@@ -282,7 +262,7 @@ class BuildCommand extends Tasks {
   protected function determineBuildBranchSource($branch) {
     // Check whether the latest build of the production branch is something we
     // can start from with.
-    $productionBranch = $this->phappDefinition->getGitBranchProduction();
+    $productionBranch = $this->phappManifest->getGitBranchProduction();
     $productionBuildBranch = 'build/' . $productionBranch;
     $process = $this->_execSilent("git log --format=oneline $productionBuildBranch --grep \"Build $productionBranch commit \"");
 

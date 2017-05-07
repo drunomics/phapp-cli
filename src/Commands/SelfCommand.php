@@ -3,14 +3,14 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\Exception\LogicException;
+use drunomics\Phapp\PhappCommandBase;
 use Humbug\SelfUpdate\Updater;
 use Robo\Robo;
-use Robo\Tasks;
 
 /**
  * Class SelfCommand.
  */
-class SelfCommand extends Tasks {
+class SelfCommand extends PhappCommandBase {
 
   /**
    * Updates the installed phar.

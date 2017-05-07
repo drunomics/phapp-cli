@@ -3,20 +3,13 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\GlobalConfig;
-use Robo\Tasks;
+use drunomics\Phapp\PhappCommandBase;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * Class CreateCommand.
  */
-class CreateCommand extends Tasks {
-
-  /**
-   * The global config.
-   *
-   * @var GlobalConfig
-   */
-  protected $globalConfig;
+class CreateCommand extends PhappCommandBase {
 
   /**
    * Ensures with a valid phapp definition to interact with.
@@ -69,12 +62,13 @@ class CreateCommand extends Tasks {
 
     $repository_url = str_replace('{{ phapp_name }}', $name, $this->globalConfig->getGitUrlPattern());
     if ($this->confirm("Should a new Git repository be initialized and pointed to $repository_url?")) {
+      $dev_branch = $this->phappManifest->getGitBranchDevelop();
       $this->_exec("cd $name &&
                 git init &&
                 git remote add origin $repository_url &&
                 git add . &&
                 git commit -am 'Initial version.' &&
-                git branch -m develop");
+                git branch -m $dev_branch");
       $this->say("Git repository has been initialized and pointed to <info>$repository_url</info>. Be sure the repository is set up and execute 'git push' once you are ready.");
     }
   }

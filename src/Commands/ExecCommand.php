@@ -2,12 +2,12 @@
 
 namespace drunomics\Phapp\Commands;
 
-use Robo\Tasks;
+use drunomics\Phapp\PhappCommandBase;
 
 /**
  * Class ExecCommand.
  */
-class ExecCommand extends Tasks {
+class ExecCommand extends PhappCommandBase {
 
   /**
    * Executes commands based on the environment.
