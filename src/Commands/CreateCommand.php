@@ -60,7 +60,7 @@ class CreateCommand extends PhappCommandBase {
     }
     $this->_exec("composer create-project $template:{$options['template-version']} $args $name");
 
-    $repository_url = str_replace('{{ phapp_name }}', $name, $this->globalConfig->getGitUrlPattern());
+    $repository_url = $this->globalConfig->getGitUrlPattern($name);
     if ($this->confirm("Should a new Git repository be initialized and pointed to $repository_url?")) {
       $dev_branch = $this->phappManifest->getGitBranchDevelop();
       $this->_exec("cd $name &&

@@ -21,30 +21,31 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected $globalConfig;
 
   /**
-   * The maniftest of the current phapp instance.
-   *
-   * @var \drunomics\Phapp\PhappManifest
-   */
-  protected $phappManifest;
-
-  /**
-   * Constructor.
-   */
-  public function __construct() {
-    $this->stopOnFail(TRUE);
-  }
-
-  /**
    * Ensures with a valid phapp definition to interact with.
    *
    * @todo: Move phappManifest and globalConfig to services.
    *
    * @hook validate
    */
-  public function initPhapp() {
-    $this->phappManifest = PhappManifest::getInstance();
-    $this->phappManifest->initShellEnvironment();
+  public function init() {
     $this->globalConfig = GlobalConfig::discoverConfig();
+    if (property_exists(get_called_class(), 'phappManifest')) {
+      $this->phappManifest = PhappManifest::getInstance();
+      $this->initShellEnvironment();
+    }
+    $this->stopOnFail(TRUE);
+  }
+
+  /**
+   * Switches the working directory and adds the composer bin-dir to the path.
+   *
+   * @return $this
+   */
+  public function initShellEnvironment() {
+    chdir($this->phappManifest->getConfigFile()->getPath());
+    $path = getenv("PATH");
+    putenv("PATH=../vendor/bin/:../bin:$path");
+    return $this;
   }
 
 }

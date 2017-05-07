@@ -1,13 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains drunomics\PhappDefinition\Exception\PhappInstanceNotFound.
- */
-
 namespace drunomics\Phapp\Exception;
-
-use Exception;
 
 /**
  * Exception thrown when no phapp instance was found.

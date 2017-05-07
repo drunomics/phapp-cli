@@ -13,6 +13,13 @@ use Symfony\Component\Process\Process;
 class BuildCommand extends PhappCommandBase {
 
   /**
+   * The maniftest of the current phapp instance.
+   *
+   * @var \drunomics\Phapp\PhappManifest
+   */
+  protected $phappManifest;
+
+  /**
    * Builds the app.
    *
    * If no branch is given, the currently checked out code is going to be built.

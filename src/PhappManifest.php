@@ -3,6 +3,7 @@
 namespace drunomics\Phapp;
 
 use drunomics\Phapp\Exception\PhappInstanceNotFoundException;
+use drunomics\Phapp\Exception\PhappManifestMalformedException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Parser;
@@ -103,19 +104,24 @@ class PhappManifest {
   public function __construct(array $config, SplFileInfo $configFile) {
     $this->config = array_replace_recursive(static::$configDefaults, $config);
     $this->configFile = $configFile;
+    $this->validate();
   }
 
   /**
-   * Switches the working directory and adds the composer bin-dir to the path.
+   * Validates the phapp manifest.
    *
-   * @return $this
+   * @throws PhappManifestMalformedException
+   *   Thrown when validation fails.
    */
-  public function initShellEnvironment() {
-    chdir($this->configFile->getPath());
-    $path = getenv("PATH");
-    putenv("PATH=../vendor/bin/:../bin:$path");
-    return $this;
+  public function validate() {
+    if (empty($this->config['name'])) {
+      throw new PhappManifestMalformedException('Phapp name is required.');
+    }
+    if (!preg_match('/^[a-z0-9_-]+$/', $this->config['name'])) {
+      throw new PhappManifestMalformedException('Phapp name may only contain lowercase alpha-numeric characters, dashes and underscores.');
+    }
   }
+
 
   /**
    * Gets information about the phapp.yml file.
@@ -124,6 +130,15 @@ class PhappManifest {
    */
   public function getConfigFile() {
     return $this->configFile;
+  }
+
+  /**
+   * Gets the app's name.
+   *
+   * @return string
+   */
+  public function getName() {
+    return $this->config['name'];
   }
 
   /**

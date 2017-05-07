@@ -93,14 +93,25 @@ class GlobalConfig {
   }
 
   /**
-   * Gets the default pattern for Git repository URLs of phapps.
+   * Gets the default pattern for Git repository URLs of phapp projects.
    *
-   * May containthe replacement token {{ phapp_name }}.
+   * May contain the replacement token {{ phapp_name }}.
+   *
+   * @param string $phapp_name
+   *   (optional) If given, replacement tokens are replaced using the given
+   *   name.
    *
    * @return string
    */
-  public function getGitUrlPattern() {
-    return $this->config['phapp_discovery']['git_url_pattern'];
+  public function getGitUrlPattern($phapp_name = NULL) {
+    if (isset($phapp_name)) {
+      return strtr($this->config['phapp_discovery']['git_url_pattern'], [
+        '{{ phapp_name }}' => $phapp_name,
+      ]);
+    }
+    else {
+      return $this->config['phapp_discovery']['git_url_pattern'];
+    }
   }
 
   /**
@@ -121,6 +132,28 @@ class GlobalConfig {
    */
   public function getPhappTemplatePackages() {
     return $this->config['phapp_templates'];
+  }
+
+  /**
+   * Gets the default path to the directory of cloned or created projects.
+   *
+   * May contain the replacement token {{ phapp_name }}.
+   *
+   * @param string $phapp_name
+   *   (optional) If given, replacement tokens are replaced using the given
+   *   name.
+   *
+   * @return string
+   */
+  public function getDefaultDirectoryPath($phapp_name) {
+    if (isset($phapp_name)) {
+      return strtr($this->config['phapp_default_directory_path'], [
+        '{{ phapp_name }}' => $phapp_name,
+      ]);
+    }
+    else {
+      return $this->config['phapp_default_directory_path'];
+    }
   }
 
 }

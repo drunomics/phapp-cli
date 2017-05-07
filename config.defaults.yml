@@ -3,6 +3,8 @@
 # Various paths to binaries used.
 command_bin:
   composer: composer
+# Default path for cloning and creating projects.
+phapp_default_directory_path: '~/projects/{{ phapp_name }}/vcs'
 # Defaults applied when initializing a new phapp.yml definition.
 phapp_init_defaults: {}
 phapp_discovery:
