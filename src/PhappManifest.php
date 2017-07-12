@@ -28,26 +28,6 @@ class PhappManifest {
   protected $config;
 
   /**
-   * An array of default config.
-   *
-   * @var array
-   */
-  static protected $configDefaults = [
-    'composer-bin' => 'composer',
-    'git' => [
-      'url' => '',
-      'mirrors' => [],
-      'branches' => [
-        'production' => 'master',
-        'develop' => 'develop',
-      ],
-    ],
-    'commands' => [
-      'build' => 'composer install --no-interaction',
-    ],
-  ];
-
-  /**
    * Finds a phapp directory based upon the current working directory.
    *
    * @return static|null
@@ -102,7 +82,9 @@ class PhappManifest {
    *   The config file info.
    */
   public function __construct(array $config, SplFileInfo $configFile) {
-    $this->config = array_replace_recursive(static::$configDefaults, $config);
+    $yamlParser = new Parser();
+    $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
+    $this->config = array_replace_recursive($default_config, $config);
     $this->configFile = $configFile;
     $this->validate();
   }
@@ -121,7 +103,6 @@ class PhappManifest {
       throw new PhappManifestMalformedException('Phapp name may only contain lowercase alpha-numeric characters, dashes and underscores.');
     }
   }
-
 
   /**
    * Gets information about the phapp.yml file.
