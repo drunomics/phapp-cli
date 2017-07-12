@@ -61,7 +61,7 @@ class GlobalConfig {
    */
   public function __construct(array $config) {
     $yamlParser = new Parser();
-    $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../config.defaults.yml'));
+    $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/config.defaults.yml'));
     $this->config = array_replace_recursive($default_config, $config);
   }
 

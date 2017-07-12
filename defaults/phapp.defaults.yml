@@ -1,0 +1,13 @@
+# Default values for every phapp manifest.
+---
+git:
+  mirrors: []
+  build_repositories: 'all'
+  branches:
+    production: master
+    develop: develop
+    build_prefix: 'build/'
+    version: 'version/'
+commands:
+  build: |
+    composer install --no-dev --no-interaction
