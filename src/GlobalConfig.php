@@ -75,15 +75,6 @@ class GlobalConfig {
   }
 
   /**
-   * Gets defaults for new phapp definition files (phapp.yml)
-   *
-   * @return mixed[]
-   */
-  public function getPhappDefinitionDefaults() {
-    return $this->config['phapp_init_defaults'];
-  }
-
-  /**
    * Gets the URL for an extra composer package repository, if any.
    *
    * @return string|null
@@ -154,6 +145,16 @@ class GlobalConfig {
     else {
       return $this->config['phapp_default_directory_path'];
     }
+  }
+
+  /**
+   * Gets the defaults applied when initializing new phapps via phapp init.
+   *
+   * @return mixed[]
+   *   The phapp manifest defaults.
+   */
+  public function getPhappInitDefaults() {
+    return $this->config['phapp_init_defaults'];
   }
 
 }

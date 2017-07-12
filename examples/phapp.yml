@@ -1,8 +1,9 @@
 # A full, commented example containing all supported manifest attributes.
 ---
-# A machine readable name of your application.
-name: example_app
-# A human readable descriptoin of your application.
+# A machine readable name of your application. Valid names consist of
+# alphanumeric characters, dashes and underscores only.
+name: example-app
+# A human readable description of your application.
 description: |
   The app description.
 git:

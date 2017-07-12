@@ -7,7 +7,13 @@ command_bin:
 # Default path for cloning and creating projects.
 phapp_default_directory_path: '~/projects/{{ phapp_name }}/vcs'
 # Defaults applied when initializing a new phapp.yml definition.
-phapp_init_defaults: {}
+phapp_init_defaults:
+  description: 'Describe your application.'
+  git:
+    mirrors: []
+  commands:
+    build: |
+      composer install --no-dev --no-interaction
 phapp_discovery:
   # A composer repository used for finding packages like phapp templates or
   # projects
