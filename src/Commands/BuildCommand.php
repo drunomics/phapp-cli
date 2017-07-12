@@ -175,7 +175,7 @@ class BuildCommand extends PhappCommandBase {
         $this->taskExec('cp .build-gitignore .gitignore')
       );
     }
-    else {
+    elseif ($symfony_fs->exists('.gitignore')) {
       $collection->addTask(
         $this->taskExec('rm .gitignore')
       );
