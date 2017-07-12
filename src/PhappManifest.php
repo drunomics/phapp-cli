@@ -166,6 +166,24 @@ class PhappManifest {
   }
 
   /**
+   * Gets the prefix used for the tags of released versions.
+   *
+   * @return string
+   */
+  public function getGitVersionTagPrefix() {
+    return $this->config['git']['branches']['version_prefix'];
+  }
+
+  /**
+   * Gets the name of the respective build branch, usually 'build/$BRANCH'.
+   *
+   * @return string
+   */
+  public function getGitBranchForBuild($source_branch) {
+    return $this->config['git']['branches']['build_prefix'] .  $source_branch;
+  }
+
+  /**
    * Gets the name of the develop branch, usually 'develop'.
    *
    * @return string

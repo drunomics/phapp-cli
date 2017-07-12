@@ -7,7 +7,7 @@ git:
     production: master
     develop: develop
     build_prefix: 'build/'
-    version: 'version/'
+    version_prefix: 'version/'
 commands:
   build: |
     composer install --no-dev --no-interaction

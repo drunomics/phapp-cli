@@ -21,8 +21,6 @@ class BuildCommand extends PhappCommandBase {
    *   If given, the branch will be checked out, built, and the build
    *   is going to be committed to the respective build branch "build/{BRANCH}".
    *
-   * @option $auto-tag-prefix A prefix of Git tags to automatically tag builds
-   *   with. Only applicable if a branch is given.
    * @option $clean Allows starting the build from a clean state. If specified,
    *   any previously installed composer dependencies are removed.
    *
@@ -30,7 +28,7 @@ class BuildCommand extends PhappCommandBase {
    *
    * @command build
    */
-  public function build($branch = NULL, $options = ['auto-tag-prefix' => 'version', 'clean' => FALSE]) {
+  public function build($branch = NULL, $options = ['clean' => FALSE]) {
     if ($branch) {
       return $this->buildAndCommit($branch, $options);
     }
@@ -114,11 +112,11 @@ class BuildCommand extends PhappCommandBase {
    *
    * @return \Robo\Collection\Collection
    */
-  protected function buildAndCommit($branch, $options = ['auto-tag-prefix' => 'version']) {
+  protected function buildAndCommit($branch, $options = []) {
     $this->stopOnFail(TRUE);
 
     $previous_branch = $this->_execSilent("git rev-parse --abbrev-ref HEAD")->getOutput();
-    $buildBranch = escapeshellarg("build/$branch");
+    $buildBranch = escapeshellarg($this->phappManifest->getGitBranchForBuild($branch));
     $branch = escapeshellarg($branch);
     $collection = $this->collectionBuilder();
     $symfony_fs = new \Symfony\Component\Filesystem\Filesystem();
@@ -206,18 +204,20 @@ class BuildCommand extends PhappCommandBase {
       }
     );
 
-    // Fetch tag.
+    // Fetch the version tag.
     $tag = FALSE;
-    if ($options['auto-tag-prefix']) {
-      $prefix = escapeshellarg($options['auto-tag-prefix']);
+    if ($prefix = $this->phappManifest->getGitVersionTagPrefix()) {
+      $prefix = escapeshellarg($prefix);
       $result = $this->_execSilent("git tag --points-at $branch | grep $prefix");
       if ($result->getExitCode() == 0) {
         $tag = $result->getOutput();
       }
     }
 
-    if ($tag) {
-      $target_tag = "build/$tag";
+    // Automatically forward version tags to builds. We only supported
+    // forwarding tags when there is a build branch prefix.
+    if ($tag && $this->phappManifest->getGitBranchForBuild($tag) != $tag) {
+      $target_tag = $this->phappManifest->getGitBranchForBuild($tag);
 
       // Ensure the target tag is not already existing (e.g. if building the
       // same commit multiple times).
@@ -263,7 +263,7 @@ class BuildCommand extends PhappCommandBase {
     // Check whether the latest build of the production branch is something we
     // can start from with.
     $productionBranch = $this->phappManifest->getGitBranchProduction();
-    $productionBuildBranch = 'build/' . $productionBranch;
+    $productionBuildBranch = $this->phappManifest->getGitBranchForBuild($productionBranch);
     $process = $this->_execSilent("git log --format=oneline $productionBuildBranch --grep \"Build $productionBranch commit \"");
 
     if ($process->isSuccessful() && $output = $process->getOutput()) {

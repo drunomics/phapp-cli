@@ -25,7 +25,7 @@ git:
     # conflicts with source branches.
     build_prefix: 'build/'
     # The prefix to use when tagging released versions.
-    version: 'version/'
+    version_prefix: 'version/'
 commands:
   build: |
     composer install --no-dev --no-interaction
