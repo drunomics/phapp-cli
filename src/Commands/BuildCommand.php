@@ -8,16 +8,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
- * Class BuildCommand.
+ * Builds an app.
  */
 class BuildCommand extends PhappCommandBase {
-
-  /**
-   * The maniftest of the current phapp instance.
-   *
-   * @var \drunomics\Phapp\PhappManifest
-   */
-  protected $phappManifest;
 
   /**
    * Builds the app.

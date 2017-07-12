@@ -10,13 +10,6 @@ use drunomics\Phapp\PhappCommandBase;
 class ExecCommand extends PhappCommandBase {
 
   /**
-   * The maniftest of the current phapp instance.
-   *
-   * @var \drunomics\Phapp\PhappManifest
-   */
-  protected $phappManifest;
-
-  /**
    * Executes commands based on the environment.
    *
    * @param string $exec_command The command to execute.

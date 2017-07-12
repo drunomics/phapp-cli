@@ -8,9 +8,14 @@ use Humbug\SelfUpdate\Updater;
 use Robo\Robo;
 
 /**
- * Class SelfCommand.
+ * Supports self-updating phars.
  */
 class SelfCommand extends PhappCommandBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $requiresPhappManifest = FALSE;
 
   /**
    * Updates the installed phar.

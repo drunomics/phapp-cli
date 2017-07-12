@@ -2,38 +2,38 @@
 
 namespace drunomics\Phapp\Commands;
 
-use drunomics\Phapp\GlobalConfig;
 use drunomics\Phapp\PhappCommandBase;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
- * Class CreateCommand.
+ * Creates a new project.
  */
 class CreateCommand extends PhappCommandBase {
 
   /**
-   * Ensures with a valid phapp definition to interact with.
-   *
-   * @hook validate
+   * {@inheritdoc}
    */
-  public function initPhapp() {
-    $this->globalConfig = GlobalConfig::discoverConfig();
-  }
+  protected $requiresPhappManifest = FALSE;
 
   /**
-   * Creates a new app based on a given template.
+   * Creates a new project base on a given template.
    *
-   * @param string $name The created app's machine readable name.
+   * @param string $name
+   *   The created project's machine readable name.
+   * @param string $target
+   *   (optional) The directory to create the project in. If not given, the
+   *   project is created in the configured default directory path.
    * @option string $template The template to use.
    * @option string $template-version A specific version of the template to use. Defaults to using the latest stable version.
    *
    * @command create
    */
-  public function execute($name = NULL, $options = ['template' => NULL, 'template-version' => '*']) {
-    $this->stopOnFail(TRUE);
-    $this->initPhapp();
+  public function execute($name = NULL, $target = NULL, $options = ['template' => NULL, 'template-version' => '*']) {
     if (!$name) {
       $name = $this->ask("Phapp name (e.g. 'new-app'):");
+    }
+    if (!isset($target)) {
+      $target = $this->globalConfig->getDefaultDirectoryPath($name);
     }
 
     if (empty($options['template'])) {
@@ -58,12 +58,12 @@ class CreateCommand extends PhappCommandBase {
     else {
       $args = '';
     }
-    $this->_exec("composer create-project $template:{$options['template-version']} $args $name");
+    $this->_exec("composer create-project $template:{$options['template-version']} $args $target");
 
     $repository_url = $this->globalConfig->getGitUrlPattern($name);
     if ($this->confirm("Should a new Git repository be initialized and pointed to $repository_url?")) {
       $dev_branch = $this->phappManifest->getGitBranchDevelop();
-      $this->_exec("cd $name &&
+      $this->_exec("cd $target &&
                 git init &&
                 git remote add origin $repository_url &&
                 git add . &&

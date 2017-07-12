@@ -14,6 +14,20 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   use LoggerAwareTrait;
 
   /**
+   * Whether the command requires a valid phapp manifest.
+   *
+   * @var bool
+   */
+  protected $requiresPhappManifest = TRUE;
+
+  /**
+   * The maniftest of the current phapp instance.
+   *
+   * @var \drunomics\Phapp\PhappManifest|null
+   */
+  protected $phappManifest;
+
+  /**
    * The global phapp config.
    *
    * @var \drunomics\Phapp\GlobalConfig
@@ -29,7 +43,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    */
   public function init() {
     $this->globalConfig = GlobalConfig::discoverConfig();
-    if (property_exists(get_called_class(), 'phappManifest')) {
+    if ($this->requiresPhappManifest) {
       $this->phappManifest = PhappManifest::getInstance();
       $this->initShellEnvironment();
     }
@@ -41,7 +55,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    *
    * @return $this
    */
-  public function initShellEnvironment() {
+  protected function initShellEnvironment() {
     chdir($this->phappManifest->getConfigFile()->getPath());
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");

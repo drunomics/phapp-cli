@@ -3,12 +3,17 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\PhappCommandBase;
-use Robo\Contract\TaskInterface;
+use Symfony\Component\Process\Process;
 
 /**
- * Class CloneCommand.
+ * Clones an app.
  */
 class CloneCommand extends PhappCommandBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $requiresPhappManifest = FALSE;
 
   /**
    * Clones a phapp project.
@@ -24,13 +29,13 @@ class CloneCommand extends PhappCommandBase {
    * @option branch The branch to clone. Defaults to the repository default
    *   branch.
    *
-   * @command clone
+   * @throws \Exception
+   *   Thrown if there are troubles cloning the repository.
    *
-   * @return \Robo\Result
+   * @command clone
    */
   public function execute($name, $target = NULL, $options = ['repository' => NULL, 'branch' => NULL]) {
     if (!isset($options['repository'])) {
-
       // @todo: Also check for a composer package with the default vendor.
       $options['repository'] = $this->globalConfig->getGitUrlPattern($name);
     }
@@ -38,8 +43,19 @@ class CloneCommand extends PhappCommandBase {
       $target = $this->globalConfig->getDefaultDirectoryPath($name);
     }
     $args = isset($options['branch']) ? ' --branch='. $options['branch'] : '';
+    $command = "git clone ${options['repository']} $target" . $args;
 
-    return $this->_exec("git clone ${options['repository']} $target" . $args);
+    // Make sure the command output is streamed while clone a repo.
+    $this->logger->info('Running ' . $command);
+    $process = new Process($command);
+    $process->enableOutput()->start();
+
+    foreach ($process as $output) {
+      echo $output;
+    }
+    if ($process->getExitCode() != 0) {
+      throw new \Exception('Error cloning repository.');
+    }
   }
 
 }
