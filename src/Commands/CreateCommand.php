@@ -100,8 +100,12 @@ class CreateCommand extends PhappCommandBase {
       $data = [];
     }
     $data = array_replace_recursive($data, $this->globalConfig->getPhappInitDefaults());
-    $data['name'] = $name;
-    $data['git']['url' ] = $this->globalConfig->getGitUrlPattern($name);
+
+    // Ensure some important attributes come first.
+    $new_data['name'] = $name;
+    $new_data['description'] = isset($data['description']) ? $data['description'] : '';
+    $new_data['git']['url' ] = $this->globalConfig->getGitUrlPattern($name);
+    $data = array_replace_recursive($new_data, $data);
     (new Filesystem())->dumpFile('phapp.yml', Yaml::dump($data, 2, 2, YAML::DUMP_MULTI_LINE_LITERAL_BLOCK));
     $this->phappManifest = PhappManifest::getInstance();
   }
