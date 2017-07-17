@@ -37,8 +37,6 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   /**
    * Ensures with a valid phapp definition to interact with.
    *
-   * @todo: Move phappManifest and globalConfig to services.
-   *
    * @hook validate
    */
   public function init() {

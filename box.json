@@ -11,6 +11,10 @@
       "name": "*.php",
       "exclude": ["Tests"],
       "in": "vendor"
+    },
+    {
+      "name": "*.yml",
+      "in": "defaults"
     }
   ],
   "git-version": "package_version",
