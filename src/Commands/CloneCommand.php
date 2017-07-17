@@ -16,7 +16,7 @@ class CloneCommand extends PhappCommandBase {
   protected $requiresPhappManifest = FALSE;
 
   /**
-   * Clones a phapp project.
+   * Clones a Phapp project.
    *
    * @param string $name
    *   The name of the phapp project to clone.

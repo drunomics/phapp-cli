@@ -20,12 +20,12 @@ class InitCommand extends PhappCommandBase  {
   protected $requiresPhappManifest = FALSE;
 
   /**
-   * Initializes a new project.
+   * Initializes a new phapp.yml for your project.
    *
    * @param string $name
    *   (optional) The project's machine readable name.
    */
-  public function initApp($name = '') {
+  public function initManifest($name = '') {
     $instance = PhappManifest::discoverInstance();
     if ($instance) {
       throw new LogicException("There is a already a phapp.yml file, aborting.");
