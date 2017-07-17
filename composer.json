@@ -29,7 +29,6 @@
   "bin":["phapp"],
   "extra": {
     "branch-alias": {
-      "dev-master": "2.x-dev"
     },
     "tools": {
       "box": {
