@@ -2,7 +2,9 @@
 
 namespace drunomics\Phapp;
 
+use drunomics\Phapp\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -72,15 +74,6 @@ class GlobalConfig {
    */
   public function getComposerBin() {
     return $this->config['command_bin']['composer'];
-  }
-
-  /**
-   * Gets the URL for an extra composer package repository, if any.
-   *
-   * @return string|null
-   */
-  public function getComposerRepository() {
-    return $this->config['phapp_discovery']['composer_repository'];
   }
 
   /**
@@ -155,6 +148,24 @@ class GlobalConfig {
    */
   public function getPhappInitDefaults() {
     return $this->config['phapp_init_defaults'];
+  }
+
+  /**
+   * Applies the global composer config like custom composer repositories.
+   */
+  public function applyGlobalComposerConfig() {
+    $commands = [];
+    foreach ($this->config['phapp_composer_config'] as $config) {
+      $commands[] = 'composer config --global ' . escapeshellcmd($config);
+    }
+    if ($commands) {
+      $command = implode("\n", $commands);
+      $process = new Process($command);
+      $process->run();
+      if ($process->getExitCode()) {
+        throw new InvalidArgumentException("Problems settings global composer config with commands: " . $command);
+      }
+    }
   }
 
 }

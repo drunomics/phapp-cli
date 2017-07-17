@@ -85,7 +85,7 @@ class PhappManifest {
     $yamlParser = new Parser();
     $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
     $this->config = array_replace_recursive($default_config, $config);
-    $this->configFile = $configFile;
+    $this->file = $configFile;
     $this->validate();
   }
 
@@ -109,8 +109,8 @@ class PhappManifest {
    *
    * @return \Symfony\Component\Finder\SplFileInfo
    */
-  public function getConfigFile() {
-    return $this->configFile;
+  public function getFile() {
+    return $this->file;
   }
 
   /**

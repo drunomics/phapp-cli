@@ -2,8 +2,14 @@
 
 namespace drunomics\Phapp\Commands;
 
+use drunomics\Phapp\Exception\LogicException;
+use drunomics\Phapp\Exception\PhappInstanceNotFoundException;
 use drunomics\Phapp\PhappCommandBase;
+use drunomics\Phapp\PhappManifest;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Creates a new project.
@@ -35,6 +41,10 @@ class CreateCommand extends PhappCommandBase {
     if (!isset($target)) {
       $target = $this->globalConfig->getDefaultDirectoryPath($name);
     }
+    $target = str_replace('~', getenv('HOME'), $target);
+    if ((new Filesystem())->exists($target)) {
+      throw new LogicException("Target directory $target already exists.");
+    }
 
     if (empty($options['template'])) {
       $choices = [];
@@ -51,16 +61,17 @@ class CreateCommand extends PhappCommandBase {
     else {
       $template = $options['template'];
     }
+    $this->say("Registering global composer config...");
+    $this->globalConfig->applyGlobalComposerConfig();
 
-    if ($package_repository = $this->globalConfig->getComposerRepository()) {
-      $args = " --repository='$package_repository'";
-    }
-    else {
-      $args = '';
-    }
-    $this->_exec("composer create-project $template:{$options['template-version']} $args $target");
+    $this->say("Creating the project...");
+    $this->_exec("composer create-project $template:{$options['template-version']} $target");
 
-    $repository_url = $this->globalConfig->getGitUrlPattern($name);
+    // There must be a phapp.yml file if not create it now.
+    chdir($target);
+    $this->updatePhappManifest($name);
+    $repository_url = $this->phappManifest->getGitUrl();
+
     if ($this->confirm("Should a new Git repository be initialized and pointed to $repository_url?")) {
       $dev_branch = $this->phappManifest->getGitBranchDevelop();
       $this->_exec("cd $target &&
@@ -71,6 +82,28 @@ class CreateCommand extends PhappCommandBase {
                 git branch -m $dev_branch");
       $this->say("Git repository has been initialized and pointed to <info>$repository_url</info>. Be sure the repository is set up and execute 'git push' once you are ready.");
     }
+  }
+
+  /**
+   * Updates the Phapp manifest based upon global defaults.
+   *
+   * @param string $name
+   *   The project name.
+   */
+  protected function updatePhappManifest($name) {
+    $this->say("Generating phapp.yml...");
+    try {
+      $this->phappManifest = PhappManifest::getInstance();
+      $data = (new Parser())->parse(file_get_contents($this->phappManifest->getFile()->getRealPath()));
+    }
+    catch (PhappInstanceNotFoundException $e) {
+      $data = [];
+    }
+    $data = array_replace_recursive($data, $this->globalConfig->getPhappInitDefaults());
+    $data['name'] = $name;
+    $data['git']['url' ] = $this->globalConfig->getGitUrlPattern($name);
+    (new Filesystem())->dumpFile('phapp.yml', Yaml::dump($data, 2, 2, YAML::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    $this->phappManifest = PhappManifest::getInstance();
   }
 
 }

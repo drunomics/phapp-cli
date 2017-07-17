@@ -4,8 +4,10 @@
 command_bin:
   composer: composer
   bash: /bin/bash
+
 # Default path for cloning and creating projects.
 phapp_default_directory_path: '~/projects/{{ phapp_name }}/vcs'
+
 # Defaults applied when initializing a new phapp.yml definition.
 phapp_init_defaults:
   description: 'Describe your application.'
@@ -14,14 +16,25 @@ phapp_init_defaults:
   commands:
     build: |
       composer install --no-dev --no-interaction
+
+# Some shared, global composer config. Typically used to add custom composer
+# repositories.
+# See https://getcomposer.org/doc/03-cli.md#composer-home-config-json
+# Entries may be composer config lines which are appended to
+# `composer config --global` commands; e.g.:
+# "repositories.foo composer https://foo.com" results in call to
+# "composer config --global repositories.foo composer https://foo.com"
+phapp_composer_config:
+  - repositories.drunomics composer https://packages.drunomics.com
+
 phapp_discovery:
-  # A composer repository used for finding packages like phapp templates or
-  # projects
-  composer_repository: https://packages.drunomics.com
+  # Whether to look for projects in composer repositories.
+  composer: true
   # The URL pattern used for finding projects or when creating projects.
   git_url_pattern: git@bitbucket.org:drunomics/{{ phapp_name }}.git
   # The default vendor used for finding or creating projects.
   package_vendor_default: drunomics
+
 phapp_templates:
   'drunomics/php-project': 'PHP or any web project'
   'drunomics/drupal-project': 'Drupal 8 (drunomics)'
