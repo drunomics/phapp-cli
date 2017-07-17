@@ -54,7 +54,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    * @return $this
    */
   protected function initShellEnvironment() {
-    chdir($this->phappManifest->getConfigFile()->getPath());
+    chdir($this->phappManifest->getFile()->getPath());
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");
     return $this;
