@@ -5,6 +5,7 @@ namespace drunomics\Phapp;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
+use Symfony\Component\Process\Process;
 
 /**
  * Base class for phapp command classes.
@@ -58,6 +59,24 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");
     return $this;
+  }
+
+  /**
+   * Helper to silently execute a command.
+   *
+   * @param string $command
+   *   The command.
+   *
+   * @return \Symfony\Component\Process\Process
+   */
+  protected function _execSilent($command) {
+    // Note that we cannot execute the task as regulary as this prints bold
+    // red warnings when we do not want it to AND it stops on fails!
+    // Because of that we execute the command directly with the symfony process
+    // helper.
+    $process = new Process($command);
+    $process->run();
+    return $process;
   }
 
 }

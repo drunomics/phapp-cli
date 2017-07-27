@@ -151,9 +151,27 @@ class PhappManifest {
    * Gets the URLs of all Git repository mirrors, if any.
    *
    * @return string[]
+   *   An array of git urls, keyed by remote names.
    */
   public function getGitMirrors() {
     return $this->config['git']['mirrors'];
+  }
+
+  /**
+   * Gets the URLs of all Git repository mirrors that contain builds.
+   *
+   * @return string[]
+   *   An array of git urls.
+   */
+  public function getGitBuildRepositories() {
+    if ($this->config['git']['build_repositories'] == 'all') {
+      $urls = $this->getGitMirrors();
+      array_unshift($urls, $this->getGitUrl());
+      return array_values($urls);
+    }
+    else {
+      return $this->config['git']['build_repositories'];
+    }
   }
 
   /**
@@ -181,6 +199,21 @@ class PhappManifest {
    */
   public function getGitBranchForBuild($source_branch) {
     return $this->config['git']['branches']['build_prefix'] .  $source_branch;
+  }
+
+  /**
+   * Gets the local name of the respective build branch.
+   *
+   * Usually this is the same as the regular, remote build branch. However, if
+   * the prefix is empty the local branch differs from the remtoe branch.
+   *
+   * @return string
+   */
+  public function getGitBranchForBuildLocal($source_branch) {
+    if (!$this->config['git']['branches']['build_prefix']) {
+      return 'build/' .  $source_branch;
+    }
+    return $this->getGitBranchForBuild($source_branch);
   }
 
   /**

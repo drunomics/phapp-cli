@@ -84,24 +84,6 @@ class BuildCommand extends PhappCommandBase {
   }
 
   /**
-   * Helper to silently execute a command.
-   *
-   * @param string $command
-   *   The command.
-   *
-   * @return \Symfony\Component\Process\Process
-   */
-  protected function _execSilent($command) {
-    // Note that we cannot execute the task as regulary as this prints bold
-    // red warnings when we do not want it to AND it stops on fails!
-    // Because of that we execute the command directly with the symfony process
-    // helper.
-    $process = new \Symfony\Component\Process\Process($command);
-    $process->run();
-    return $process;
-  }
-
-  /**
    * Builds the project and commits it.
    *
    * The build is going to be committed to the respective build branch
