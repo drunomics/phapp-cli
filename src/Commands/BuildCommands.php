@@ -93,7 +93,7 @@ class BuildCommands extends PhappCommandBase {
     $this->getGitCommands()->ensureGitWorkspaceIsClean();
 
     $previous_branch = $this->_execSilent("git rev-parse --abbrev-ref HEAD")->getOutput();
-    $buildBranch = escapeshellarg($this->phappManifest->getGitBranchForBuild($branch));
+    $buildBranch = $this->phappManifest->getGitBranchForBuild($branch);
     $branchEscaped = escapeshellarg($branch);
     $collection = $this->collectionBuilder();
     $symfony_fs = new \Symfony\Component\Filesystem\Filesystem();
@@ -115,7 +115,7 @@ class BuildCommands extends PhappCommandBase {
     );
 
     // Make sure the build branch exists.
-    $branch_exists = $this->_execSilent("git branch --list $buildBranch | grep $buildBranch")->getExitCode() == 0;
+    $branch_exists = $this->_execSilent("git branch -a --list | grep $buildBranch -q")->getExitCode() == 0;
 
     if ($branch_exists) {
       $task = $this->taskGitStack()
