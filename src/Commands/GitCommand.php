@@ -145,7 +145,7 @@ class GitCommand extends PhappCommandBase  {
   protected function updateBranchFromFetchedRemote($remote, $branch, $current_branch, $remote_branch = NULL) {
     $remote_branch = $remote_branch ?: $branch;
     if ($current_branch == $branch) {
-      return "git merge $remote/$remote_branch --no-stat --quiet";
+      return "git merge $remote/$remote_branch --no-stat --no-edit --quiet";
     }
     else {
       // 1. git fetch will fail if the remote branch is older than the local
