@@ -3,7 +3,7 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\PhappCommandBase;
-use Robo\Robo;
+use drunomics\Phapp\ServiceUtil\GitCommandsTrait;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -12,6 +12,8 @@ use Symfony\Component\Process\Process;
  * Builds an app.
  */
 class BuildCommands extends PhappCommandBase {
+
+  use GitCommandsTrait;
 
   /**
    * Builds the project with the current code checkout.
@@ -88,10 +90,11 @@ class BuildCommands extends PhappCommandBase {
    */
   public function buildBranch($branch, $options = ['clean' => TRUE]) {
     $this->stopOnFail(TRUE);
+    $this->getGitCommands()->ensureGitWorkspaceIsClean();
 
     $previous_branch = $this->_execSilent("git rev-parse --abbrev-ref HEAD")->getOutput();
     $buildBranch = escapeshellarg($this->phappManifest->getGitBranchForBuild($branch));
-    $branch = escapeshellarg($branch);
+    $branchEscaped = escapeshellarg($branch);
     $collection = $this->collectionBuilder();
     $symfony_fs = new \Symfony\Component\Filesystem\Filesystem();
 
@@ -101,44 +104,39 @@ class BuildCommands extends PhappCommandBase {
       ->checkout($previous_branch));
 
     // Make sure the target branch exists.
-    if ($this->_execSilent("git branch --list $branch | grep $branch")->getExitCode() != 0) {
-      throw new InvalidArgumentException("The branch $branch does not exist.");
+    if ($this->_execSilent("git branch --list $branchEscaped | grep $branchEscaped")->getExitCode() != 0) {
+      throw new InvalidArgumentException("The branch $branchEscaped does not exist.");
     }
+
+    // Update the branch and build branch.
+    $this->getGitCommands()->setupGitRemotes(['fetch' => TRUE]);
+    $collection->addTask(
+      $this->getGitCommands()->pullBranch($branch)
+    );
 
     // Make sure the build branch exists.
     $branch_exists = $this->_execSilent("git branch --list $buildBranch | grep $buildBranch")->getExitCode() == 0;
 
     if ($branch_exists) {
-      // Update the build branch.
       $task = $this->taskGitStack()
         ->checkout($buildBranch)
-        ->exec('reset --hard');
-      // Only pull from the remote if the remote branch exists.
-      $remote = $this->phappManifest->getGitUrl() ?: 'origin';
-      if ($this->_execSilent("git fetch $remote && git branch -r --contains $buildBranch")->getOutput()) {
-        $task->pull($remote, $buildBranch);
-      }
-      $task->merge($branch);
+        ->exec('reset --hard')
+        ->merge($branch);
       $collection->addTask($task);
     }
     else {
-      $sourceBranch = $this->determineBuildBranchSource($branch, $buildBranch);
-      $collection->addCode(function() use ($sourceBranch) {
-        $this->say("Creating a new build branch based upon <info>$sourceBranch</info>");
+      $ancestorBranch = $this->determineBuildBranchAncestor($branch, $buildBranch);
+      $collection->addCode(function() use ($ancestorBranch) {
+        $this->say("Creating a new build branch based upon <info>$ancestorBranch</info>");
       });
-      // Update the source branch.
-      $task = $this->taskGitStack()
-        ->checkout($sourceBranch)
-        ->exec('reset --hard');
-      // Only pull if the remote branch exists.
-      $remote = $this->phappManifest->getGitUrl() ?: 'origin';
-      if ($this->_execSilent("git fetch $remote && git branch -r --contains $sourceBranch")->getOutput()) {
-        $task->pull($remote, $sourceBranch);
-      }
+      // Update the ancestor branch.
+      $collection->addTask(
+        $this->getGitCommands()->pullBranch($ancestorBranch)
+      );
       // Create the build branch and merge in changes.
-      $task
+      $task = $this->taskGitStack()
         ->exec("checkout -b $buildBranch")
-        ->merge($branch);
+        ->merge($branchEscaped);
       $collection->addTask($task);
     }
 
@@ -168,7 +166,7 @@ class BuildCommands extends PhappCommandBase {
       ->exec("add -A")
       // Note that git commit uses ' already, so we remove ours. Also, we allow
       // empty commits in case no assets were changed the merge might be enough.
-      ->commit(sprintf("Build %s commit %s.", trim($branch, '\''), trim($commit_hash, '\'')), '--allow-empty --no-verify');
+      ->commit(sprintf("Build %s commit %s.", trim($branchEscaped, '\''), trim($commit_hash, '\'')), '--allow-empty --no-verify');
 
     $collection->addTask($task);
 
@@ -182,7 +180,7 @@ class BuildCommands extends PhappCommandBase {
     $tag = FALSE;
     if ($prefix = $this->phappManifest->getGitVersionTagPrefix()) {
       $prefix = escapeshellarg($prefix);
-      $result = $this->_execSilent("git tag --points-at $branch | grep $prefix");
+      $result = $this->_execSilent("git tag --points-at $branchEscaped | grep $prefix");
       if ($result->getExitCode() == 0) {
         $tag = $result->getOutput();
       }
@@ -226,14 +224,15 @@ class BuildCommands extends PhappCommandBase {
   }
 
   /**
-   * Determines the source branch for the new build branch.
+   * Determines the ancestor for the new build branch.
    *
    * @param string $branch
    *   The to be built branch.
    *
    * @return string
+   *   The build branch upon which to base the new build branch.
    */
-  protected function determineBuildBranchSource($branch) {
+  protected function determineBuildBranchAncestor($branch) {
     // Check whether the latest build of the production branch is something we
     // can start from with.
     $productionBranch = $this->phappManifest->getGitBranchProduction();

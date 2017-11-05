@@ -37,9 +37,20 @@ trait GitCommandsTrait {
    */
   public function getGitCommands() {
     if (empty($this->gitCommands)) {
-      $this->gitCommands = Robo::getContainer()->get(GitCommands::class);
+      $this->gitCommands = Robo::getContainer()->get('\\' . GitCommands::class . 'Commands');
     }
     return $this->gitCommands;
+  }
+
+  /**
+   * Ensures the Git commands class has been initalized.
+   *
+   * @todo: Remove global initalization out of command init.
+   *
+   * @hook validate
+   */
+  public function initGitCommands() {
+    $this->getGitCommands()->init();
   }
 
 }
