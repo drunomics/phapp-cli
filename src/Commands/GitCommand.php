@@ -29,12 +29,23 @@ class GitCommand extends PhappCommandBase  {
     $this->setupGitRemotes();
     if (!$branch) {
       $collection = $this->collectionBuilder()->getCollection();
+
+      // Handle man development branch.
+      $branch = $this->phappManifest->getGitBranchDevelop();
+      if (!$this->branchExists($branch, 'origin')) {
+        throw new LogicException("The development branch $branch does not exist in the repository yet. Nothing to pull from");
+      }
       $collection->add(
-        $this->pullBranch($this->phappManifest->getGitBranchDevelop(), $options)
+        $this->pullBranch($branch, $options)
       );
-      $collection->add(
-        $this->pullBranch($this->phappManifest->getGitBranchProduction(), $options)
-      );
+      // Handle production branch. Ignore if it's not there yet as this might be
+      // the case in a pre-production phase.
+      $branch = $this->phappManifest->getGitBranchProduction();
+      if ($this->branchExists($branch, 'origin')) {
+        $collection->add(
+          $this->pullBranch($branch, $options)
+        );
+      }
       return $collection;
     }
     else {
@@ -65,12 +76,17 @@ class GitCommand extends PhappCommandBase  {
       if (!($options['remote'] == 'all' || $options['remote'] == $name)) {
         continue;
       }
+      if (!$this->branchExists($branch, $name)) {
+        $this->say("Branch $branch is not existing at remote $name yet, nothing to pull from.");
+        continue;
+      }
       $collection->addCode(function() use ($name) {
         $this->say("Pulling from <info>$name</info>...");
       });
 
       if ($current_branch == $branch) {
-        $task = $this->taskExec("git pull $name $branch -n");
+        // We never want published branches to be rebased!
+        $task = $this->taskExec("git pull $name $branch --no-stat --rebase=false");
       }
       else {
         $task = $this->taskExec("git fetch $name $branch:$branch");
@@ -86,18 +102,16 @@ class GitCommand extends PhappCommandBase  {
       $build_branch = $this->phappManifest->getGitBranchForBuild($branch);
       $local_build_branch = $this->phappManifest->getGitBranchForBuildLocal($branch);
 
-      // Check whether the branch has a build branch.
-      $result = $this->_execSilent("/bin/bash -c 'git ls-remote --heads $url $build_branch | grep $build_branch -q'");
-      if ($result->getExitCode() > 0) {
+      // Silently ignore not existing build branches, they might not exist yet.
+      if (!$this->branchExists($build_branch, $url)) {
         continue;
       }
-
       $collection->addCode(function() use ($url) {
         $this->say("Pulling build branch from <info>$url</info>...");
       });
 
       if ($current_branch == $local_build_branch) {
-        $task = $this->taskExec("git pull $url $build_branch -n");
+        $task = $this->taskExec("git pull $url $build_branch --no-stat --rebase=false");
       }
       else {
         $task = $this->taskExec("git fetch $url $local_build_branch:$build_branch");
@@ -149,6 +163,21 @@ class GitCommand extends PhappCommandBase  {
       throw new \LogicException("Git workspace is dirty: \n" .
         $this->_execSilent('git status --porcelain')->getOutput());
     }
+  }
+
+  /**
+   * Determines whether a branch exists in a given repository.
+   *
+   * @param string $branch
+   *   The branch name.
+   * @param string $repository
+   *   (optional) The remote name or repository url. Defaults to 'origin'.
+   *
+   * @return bool
+   */
+  public function branchExists($branch, $repository = 'origin') {
+    $result = $this->_execSilent("/bin/bash -c 'git ls-remote --heads $repository $branch | grep $branch -q'");
+    return $result->getExitCode() == 0;
   }
 
 }
