@@ -158,16 +158,27 @@ class PhappManifest {
   }
 
   /**
+   * Gets the URLs of all Git repositories.
+   *
+   * @return string[]
+   *   An array of git urls, keyed by remote names.
+   */
+  public function getGitRemotes() {
+    return [
+      'origin' => $this->getGitUrl(),
+    ]
+    + $this->getGitMirrors();
+  }
+
+  /**
    * Gets the URLs of all Git repository mirrors that contain builds.
    *
    * @return string[]
-   *   An array of git urls.
+   *   An array of git urls, keyed by remote names.
    */
   public function getGitBuildRepositories() {
     if ($this->config['git']['build_repositories'] == 'all') {
-      $urls = $this->getGitMirrors();
-      array_unshift($urls, $this->getGitUrl());
-      return array_values($urls);
+      return $this->getGitRemotes();
     }
     else {
       return $this->config['git']['build_repositories'];

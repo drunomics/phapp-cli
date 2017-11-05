@@ -4,6 +4,7 @@ namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\Exception\LogicException;
 use drunomics\Phapp\PhappCommandBase;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Contains git:* commands.
@@ -26,7 +27,9 @@ class GitCommand extends PhappCommandBase  {
    * @command git:pull
    */
   public function pullBranches($branch = NULL, $options = ['remote' => 'all']) {
-    $this->setupGitRemotes();
+    // Make sure all remotes are there and update them.
+    $this->setupGitRemotes(['remote' => $options['remote'], 'fetch' => TRUE]);
+
     if (!$branch) {
       $collection = $this->collectionBuilder()->getCollection();
 
@@ -56,6 +59,9 @@ class GitCommand extends PhappCommandBase  {
   /**
    * Pulls a single branch.
    *
+   * Note: This assumes remotes are fetched already. Run setupGitRemotes() to
+   * do so if needed.
+   *
    * @param string $branch
    *   The branch to pull.
    * @option string $remote The remote to pull from. Defaults to all.
@@ -64,38 +70,39 @@ class GitCommand extends PhappCommandBase  {
    */
   public function pullBranch($branch, $options = ['remote' => 'all']) {
     $this->ensureGitWorkspaceIsClean();
-    $collection = $this->collectionBuilder()->getCollection();
+    $collection = $this->collectionBuilder()
+      ->setVerbosityThreshold(OutputInterface::VERBOSITY_NORMAL)
+      ->getCollection();
     $current_branch = trim($this->_execSilent("git rev-parse --abbrev-ref HEAD")->getOutput());
 
-    $remotes = [
-      'origin' => $this->phappManifest->getGitUrl(),
-    ]
-    + $this->phappManifest->getGitMirrors();
+    $collection->addCode(function() use ($branch) {
+      $this->say("Updating <info>$branch</info>...");
+    });
+    // Make one command per branch.
+    $exec = [];
 
-    foreach ($remotes as $name => $url) {
+    foreach ($this->phappManifest->getGitRemotes() as $name => $url) {
       if (!($options['remote'] == 'all' || $options['remote'] == $name)) {
         continue;
       }
+      // Silently ignore not existing branches at some remotes.
       if (!$this->branchExists($branch, $name)) {
-        $this->say("Branch $branch is not existing at remote $name yet, nothing to pull from.");
+        $collection->addCode(function() use ($branch, $name) {
+          $this->io()->note("Branch $branch is not existing at remote $name.");
+        });
         continue;
       }
-      $collection->addCode(function() use ($name) {
-        $this->say("Pulling from <info>$name</info>...");
-      });
-
-      if ($current_branch == $branch) {
-        // We never want published branches to be rebased!
-        $task = $this->taskExec("git pull $name $branch --no-stat --rebase=false");
-      }
-      else {
-        $task = $this->taskExec("git fetch $name $branch:$branch");
-      }
-      $collection->add($task);
+      $exec[] = $this->updateBranchFromFetchedRemote($name, $branch, $current_branch);
     }
 
+    // Note: We do not use robo's taskExecStack as this is to verbose and prints
+    // commands twice.
+    $task = $this->taskExec(implode(' && ', $exec));
+    $collection->add($task);
+    $exec = [];
+
     // Take care of build branches.
-    foreach ($this->phappManifest->getGitBuildRepositories() as $url) {
+    foreach ($this->phappManifest->getGitBuildRepositories() as $name => $url) {
       if (!($options['remote'] == 'all' || (isset($remotes[$options['remote']]) && $remotes[$options['remote']] == $url))) {
         continue;
       }
@@ -103,36 +110,64 @@ class GitCommand extends PhappCommandBase  {
       $local_build_branch = $this->phappManifest->getGitBranchForBuildLocal($branch);
 
       // Silently ignore not existing build branches, they might not exist yet.
-      if (!$this->branchExists($build_branch, $url)) {
+      if (!$this->branchExists($build_branch, $name)) {
         continue;
       }
-      $collection->addCode(function() use ($url) {
-        $this->say("Pulling build branch from <info>$url</info>...");
-      });
-
-      if ($current_branch == $local_build_branch) {
-        $task = $this->taskExec("git pull $url $build_branch --no-stat --rebase=false");
-      }
-      else {
-        $task = $this->taskExec("git fetch $url $local_build_branch:$build_branch");
-      }
-      $collection->add($task);
+      $exec[] = $this->updateBranchFromFetchedRemote($name, $local_build_branch, $current_branch, $build_branch);
     }
 
+    if ($exec) {
+      $collection->addCode(function() use ($build_branch) {
+        $this->say("Updating branch of <info>$build_branch</info>...");
+      });
+      $task = $this->taskExec(implode(' && ', $exec));
+      $collection->add($task);
+    }
     return $collection;
+  }
+
+  /**
+   * Updates the branch via a merge from the remote branch.
+   *
+   * @param $remote
+   *   The remote alias.
+   * @param $branch
+   *   The branch to update, as named locally.
+   * @param $current_branch
+   *   The currently checked-out branch.
+   * @param $remote_branch
+   *   (optional) The branch name at the remote. If not passsed, the same branch
+   *   name as locally will be assumed.
+   *
+   * @return string
+   *   The command to update the branch.
+   */
+  protected function updateBranchFromFetchedRemote($remote, $branch, $current_branch, $remote_branch = NULL) {
+    $remote_branch = $remote_branch ?: $branch;
+    if ($current_branch == $branch) {
+      return "git merge $remote/$remote_branch --no-stat --quiet";
+    }
+    else {
+      // 1. git fetch will fail if the remote branch is older than the local
+      // branch. Ignore the fail if this is the case, but the branch is merged.
+      // 2. We cannot just do git fetch REMOTE branch:branch as we do not want
+      // to fetch the branch again, thus pass $PWD as remote and refer to the
+      // remote branch directly.
+      // See https://stackoverflow.com/questions/6777629/merge-branches-without-checking-out-branch
+      return "(git fetch \$PWD $remote/$remote_branch:$branch -q || git merge-base --is-ancestor $remote/$remote_branch $branch)";
+    }
   }
 
   /**
    * Configures Git remote repositories.
    *
    * @option force Overwrite existing remotes if any
+   * @option fetch Fetch the remote repositories after setup.
    *
    * @command git:setup
    */
-  public function setupGitRemotes($options = ['force' => FALSE]) {
-    $remotes = [
-      'origin' => $this->phappManifest->getGitUrl(),
-    ] + $this->phappManifest->getGitMirrors();
+  public function setupGitRemotes($options = ['force' => FALSE, 'fetch' => FALSE]) {
+    $remotes = $this->phappManifest->getGitRemotes() + $this->phappManifest->getGitBuildRepositories();
     foreach ($remotes as $name => $url) {
       $result = $this->_execSilent('git remote get-url ' . $name);
       if ($result->getExitCode() == 0 && trim($result->getOutput()) != trim($url)) {
@@ -147,7 +182,10 @@ class GitCommand extends PhappCommandBase  {
         $this->_exec("git remote add $name $url");
       }
       else {
-        $this->say("Remote $name already present.");
+        $this->say("Remote <info>$name</info> already present.");
+      }
+      if ($options['fetch']) {
+        $this->_exec("git fetch $name");
       }
     }
   }
@@ -168,6 +206,9 @@ class GitCommand extends PhappCommandBase  {
   /**
    * Determines whether a branch exists in a given repository.
    *
+   * Note: This assumes remotes are fetched already. Run setupGitRemotes() to
+   * do so if needed.
+   *
    * @param string $branch
    *   The branch name.
    * @param string $repository
@@ -176,7 +217,7 @@ class GitCommand extends PhappCommandBase  {
    * @return bool
    */
   public function branchExists($branch, $repository = 'origin') {
-    $result = $this->_execSilent("/bin/bash -c 'git ls-remote --heads $repository $branch | grep $branch -q'");
+    $result = $this->_execSilent("/bin/bash -c 'git branch --list -r $repository/$branch | grep $branch -q'");
     return $result->getExitCode() == 0;
   }
 

@@ -11,12 +11,13 @@ git:
   url: git@github.com/vendor/project.git
   # A list of git mirrors of the main repository.
   # Mirrors are kept up to date when pushing changes.
-  mirrors: []
+  mirrors:
+    mirror1: mirror1-url
   # A list of repositories to push builds into.
   # If set to 'all' (default), builds are pushed into all repositories.
   # If set to [], builds are never pushed.
   build_repositories:
-    - git@github.com/vendor/build-project.git
+    buildrepo1: git@github.com/vendor/build-project.git
   # The branch names to use for various branches.
   branches:
     production: master
