@@ -215,6 +215,8 @@ class GitCommand extends PhappCommandBase  {
    *   (optional) The remote name or repository url. Defaults to 'origin'.
    *
    * @return bool
+   *
+   * @command false
    */
   public function branchExists($branch, $repository = 'origin') {
     $result = $this->_execSilent("/bin/bash -c 'git branch --list -r $repository/$branch | grep $branch -q'");

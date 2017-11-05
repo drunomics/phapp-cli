@@ -13,13 +13,7 @@ use Symfony\Component\Process\Process;
 class BuildCommand extends PhappCommandBase {
 
   /**
-   * Builds the app.
-   *
-   * If no branch is given, the currently checked out code is going to be built.
-   *
-   * @param string $branch
-   *   If given, the branch will be checked out, built, and the build
-   *   is going to be committed to the respective build branch "build/{BRANCH}".
+   * Builds the project with the current code checkout.
    *
    * @option $clean Allows starting the build from a clean state. If specified,
    *   any previously installed composer dependencies are removed.
@@ -28,13 +22,8 @@ class BuildCommand extends PhappCommandBase {
    *
    * @command build
    */
-  public function build($branch = NULL, $options = ['clean' => FALSE]) {
-    if ($branch) {
-      return $this->buildAndCommit($branch, $options);
-    }
-    else {
-      return $this->doBuild($options);
-    }
+  public function build($options = ['clean' => FALSE]) {
+    return $this->doBuild($options);
   }
 
   /**
@@ -84,17 +73,19 @@ class BuildCommand extends PhappCommandBase {
   }
 
   /**
-   * Builds the project and commits it.
+   * Builds a given branch.
    *
-   * The build is going to be committed to the respective build branch
-   * "build/{BRANCH}".
+   * The build is going to be committed to the respective build branch.
    *
    * @param string $branch
    *   The branch to check out and build.
+   * @option $clean Cleans data from previous builds before starting the build.
    *
    * @return \Robo\Collection\Collection
+   *
+   * @command build:branch
    */
-  protected function buildAndCommit($branch, $options = []) {
+  public function buildBranch($branch, $options = ['clean' => TRUE]) {
     $this->stopOnFail(TRUE);
 
     $previous_branch = $this->_execSilent("git rev-parse --abbrev-ref HEAD")->getOutput();
@@ -288,6 +279,8 @@ class BuildCommand extends PhappCommandBase {
    * Cleans all build related files.
    *
    * Removes all dependencies that are installed via composer.
+   *
+   * @todo: Make cleaning builds customizable.
    *
    * @command build:clean
    */
