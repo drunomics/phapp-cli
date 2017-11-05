@@ -164,7 +164,7 @@ class GitCommand extends PhappCommandBase  {
    * @option force Overwrite existing remotes if any
    * @option fetch Fetch the remote repositories after setup.
    *
-   * @command git:setup
+   * @command git:setup-remotes
    */
   public function setupGitRemotes($options = ['force' => FALSE, 'fetch' => FALSE]) {
     $remotes = $this->phappManifest->getGitRemotes() + $this->phappManifest->getGitBuildRepositories();
