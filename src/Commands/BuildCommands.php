@@ -3,6 +3,7 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\PhappCommandBase;
+use Robo\Robo;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -10,7 +11,7 @@ use Symfony\Component\Process\Process;
 /**
  * Builds an app.
  */
-class BuildCommand extends PhappCommandBase {
+class BuildCommands extends PhappCommandBase {
 
   /**
    * Builds the project with the current code checkout.

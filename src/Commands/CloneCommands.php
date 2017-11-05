@@ -8,7 +8,7 @@ use Symfony\Component\Process\Process;
 /**
  * Clones an app.
  */
-class CloneCommand extends PhappCommandBase {
+class CloneCommands extends PhappCommandBase {
 
   /**
    * {@inheritdoc}

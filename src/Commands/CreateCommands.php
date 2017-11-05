@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Creates a new project.
  */
-class CreateCommand extends PhappCommandBase {
+class CreateCommands extends PhappCommandBase {
 
   /**
    * {@inheritdoc}

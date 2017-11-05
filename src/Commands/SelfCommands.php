@@ -10,7 +10,7 @@ use Robo\Robo;
 /**
  * Supports self-updating phars.
  */
-class SelfCommand extends PhappCommandBase {
+class SelfCommands extends PhappCommandBase {
 
   /**
    * {@inheritdoc}

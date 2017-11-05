@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Inits phapp.yml for new projects.
  */
-class InitCommand extends PhappCommandBase  {
+class InitCommands extends PhappCommandBase  {
 
   /**
    * {@inheritdoc}

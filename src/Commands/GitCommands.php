@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Contains git:* commands.
  */
-class GitCommand extends PhappCommandBase  {
+class GitCommands extends PhappCommandBase  {
 
   /**
    * {@inheritdoc}

@@ -21,7 +21,7 @@ elseif (file_exists(__DIR__.'/../../autoload.php')) {
 }
 
 $discovery = new CommandFileDiscovery();
-$discovery->setSearchPattern('*Command.php');
+$discovery->setSearchPattern('*Commands.php');
 $commandClasses = $discovery->discover(__DIR__ . '/src/Commands', '\drunomics\Phapp\Commands');
 
 $statusCode = Robo::run(

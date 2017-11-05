@@ -5,9 +5,9 @@ namespace drunomics\Phapp\Commands;
 use drunomics\Phapp\PhappCommandBase;
 
 /**
- * Class ExecCommand.
+ * Class ExecCommands.
  */
-class ExecCommand extends PhappCommandBase {
+class ExecCommands extends PhappCommandBase {
 
   /**
    * Executes commands based on the environment.
