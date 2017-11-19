@@ -75,6 +75,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    *   Thrown when the environment is undefined.
    */
   protected function initPhappEnviromentVariables() {
+    // Check whether manifest is required.
     // @todo: Read .env via symfony dotenv here.
     if (!getenv('PHAPP_ENV')) {
       throw new PhappEnvironmentUndefinedException();
