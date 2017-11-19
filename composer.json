@@ -11,6 +11,7 @@
   "require": {
     "consolidation/robo": "^1.0",
     "padraic/phar-updater": "^1.0",
+    "symfony/dotenv": "^3.3",
     "symfony/event-dispatcher": "^3.1",
     "symfony/yaml": "~3.0"
   },

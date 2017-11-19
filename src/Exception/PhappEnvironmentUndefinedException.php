@@ -10,7 +10,7 @@ class PhappEnvironmentUndefinedException extends \Exception {
   /**
    * {@inheritdoc}
    */
-  public function __construct($message = 'The phapp environment is undefined. Run phapp setup $ENVIRONMENT to initialize it.', $code = 0, \Exception $previous = NULL) {
+  public function __construct($message = 'The phapp environment is undefined. Run "phapp setup $ENVIRONMENT" to initialize it.', $code = 0, \Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
   }
 

@@ -6,6 +6,7 @@ use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Process\Process;
 
 /**
@@ -75,8 +76,10 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    *   Thrown when the environment is undefined.
    */
   protected function initPhappEnviromentVariables() {
-    // Check whether manifest is required.
-    // @todo: Read .env via symfony dotenv here.
+    if (file_exists('.env')) {
+      $dotenv = new Dotenv();
+      $dotenv->load('.env');
+    }
     if (!getenv('PHAPP_ENV')) {
       throw new PhappEnvironmentUndefinedException();
     }
