@@ -18,6 +18,7 @@ class ExecCommands extends PhappCommandBase {
    * @command exec
    */
   public function execCommand($exec_command, array $arguments) {
+    $this->io()->warning("The current exec command is deprecated in will change in an upcoming version. Stop using it!");
     $currentpath = realpath(getcwd());
     if ($strpos = strpos($currentpath, "vcs/web")) {
       $projectpath = substr($currentpath, 0, $strpos);
