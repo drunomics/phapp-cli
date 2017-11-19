@@ -2,6 +2,7 @@
 
 namespace drunomics\Phapp;
 
+use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
@@ -50,19 +51,38 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   }
 
   /**
-   * Switches the working directory and adds the composer bin-dir to the path.
+   * Initializes the shell environment.
+   *
+   * Switches the working directory, initializes all phapp environment variables
+   * and adds the composer bin-dir to the path.
    *
    * @return $this
    */
   protected function initShellEnvironment() {
+    // Switch working directory.
     chdir($this->phappManifest->getFile()->getPath());
+    // Add the composer bin-dir to the path.
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");
+    $this->initPhappEnviromentVariables();
     return $this;
   }
 
   /**
-   * Helper to silently execute a command.
+   * Initializes all phapp environment variables.
+   *
+   * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
+   *   Thrown when the environment is undefined.
+   */
+  protected function initPhappEnviromentVariables() {
+    // @todo: Read .env via symfony dotenv here.
+    if (!getenv('PHAPP_ENV')) {
+      throw new PhappEnvironmentUndefinedException();
+    }
+  }
+
+  /**
+   * Silently execute a command in bash.
    *
    * @param string $command
    *   The command.
@@ -70,6 +90,9 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    * @return \Symfony\Component\Process\Process
    */
   protected function _execSilent($command) {
+    // @todo: Enforce piping the command through bash if the active shell is not
+    // bash.
+
     // Note that we cannot execute the task as regulary as this prints bold
     // red warnings when we do not want it to AND it stops on fails!
     // Because of that we execute the command directly with the symfony process
@@ -78,5 +101,20 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $process->run();
     return $process;
   }
+
+  /**
+   * Executes a command in bash.
+   *
+   * @param string $command
+   *   The command to execute.
+   *
+   * @return \Robo\Result
+   */
+  protected function _exec($command) {
+    // @todo: Enforce piping the command through bash if the active shell is not
+    // bash.
+    return parent::_exec($command);
+  }
+
 
 }
