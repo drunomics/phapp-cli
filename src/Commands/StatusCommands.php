@@ -3,7 +3,6 @@
 namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\PhappCommandBase;
-use Robo\Result;
 use Robo\ResultData;
 
 /**
