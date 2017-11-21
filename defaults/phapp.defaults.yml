@@ -11,3 +11,5 @@ git:
 commands:
   build: |
     composer install --no-dev --no-interaction
+  init:
+  update:
