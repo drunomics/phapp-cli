@@ -62,7 +62,32 @@ is:
      self
       self:rollback         Rolls back to the previous version after a self-update.
       self:update           Updates the installed phar.
+      
+## phapp.yml
 
+An application provides basic metadata and customizes commands in its 
+`phapp.yml`, the phapp manifest. See [examples/phapp.yml](https://github.com/drunomics/phapp-cli/blob/master/examples/phapp.yml)
+for an example.
+      
+## Phapp environment variables
+
+Commands defined in `phapp.yml` may make use of the phapp environment
+variables. Phapp environment variables are either set by the environment; i.e.
+the host, or via a [.env](https://symfony.com/doc/current/components/dotenv.html)
+file.
+
+Available environment variables are / must be:
+
+Variable | Description
+--- | --- 
+| PHAPP_ENV       | The environment name. E.g., local, test or live |
+| PHAPP_ENV_TYPE  | The environment type; e.g. an id for the hosting environment or type of server. |
+| PHAPP_ENV_MODE  | The environment mode; valid values are: production, development |
+
+More environment variables which are pending definition:
+- PHAPP_ENV_DUMP_DIR
+- PHAPP_ENV_DUMP_DB_FILENAME
+- PHAPP_ENV_MYSQL_DEFAULT_DATABASE
 
 ## Phapp development
 
