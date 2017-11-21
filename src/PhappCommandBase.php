@@ -79,6 +79,12 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     if (file_exists('.env')) {
       $dotenv = new Dotenv();
       $dotenv->load('.env');
+      // Support loading multiple dotenv "includes".
+      if ($files = getenv('PHAPP_DOTENV_FILES')) {
+        foreach (explode(',', $files) as $file) {
+          $dotenv->load($file);
+        }
+      }
     }
     if (!getenv('PHAPP_ENV')) {
       throw new PhappEnvironmentUndefinedException();
