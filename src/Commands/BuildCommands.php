@@ -329,6 +329,10 @@ class BuildCommands extends PhappCommandBase {
     foreach ($dirs as &$dir) {
       $dir = str_replace($cwd . '/', '', $dir);
     }
+    // Ensure the current dir is not removed.
+    $dirs = array_filter($dirs, function($dir) use ($cwd) {
+      return $dir && realpath($dir) != $cwd;
+    });
     return $this->taskDeleteDir($dirs);
   }
 }
