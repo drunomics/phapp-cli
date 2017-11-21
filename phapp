@@ -8,9 +8,6 @@
  * See https://github.com/consolidation/Robo/blob/master/docs/framework.md.
  */
 
-use Consolidation\AnnotatedCommand\CommandFileDiscovery;
-use Robo\Robo;
-
 // Support loading composer autoloader if installed as part of dependencies
 // or as project.
 if (file_exists(__DIR__.'/vendor/autoload.php')) {
@@ -20,14 +17,8 @@ elseif (file_exists(__DIR__.'/../../autoload.php')) {
   require_once __DIR__ . '/../../autoload.php';
 }
 
-$discovery = new CommandFileDiscovery();
-$discovery->setSearchPattern('*Commands.php');
-$commandClasses = $discovery->discover(__DIR__ . '/src/Commands', '\drunomics\Phapp\Commands');
+$application = new \Robo\Application('phapp','@package_version@');
+$runner = new \drunomics\Phapp\PhappRunner();
+$statusCode = $runner->run(NULL, NULL, $application);
 
-$statusCode = Robo::run(
-  $_SERVER['argv'],
-  $commandClasses,
-  'phapp',
-  '@package_version@'
-);
 exit($statusCode);
