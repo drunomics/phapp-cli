@@ -278,13 +278,27 @@ class BuildCommands extends PhappCommandBase {
   /**
    * Cleans all build related files.
    *
-   * Removes all dependencies that are installed via composer.
-   *
-   * @todo: Make cleaning builds customizable.
-   *
    * @command build:clean
    */
   public function clean() {
+    $command = $this->phappManifest->getCommand('clean');
+    if (!$command) {
+      // Default to cleaning composer vendors.
+      return $this->cleanComposerVendors();
+    }
+    else {
+      return $this->_exec($command);
+    }
+  }
+
+  /**
+   * Cleans all dependencies that are installed via composer.
+   *
+   * @todo: Make cleaning builds customizable.
+   *
+   * @command build:clean:composer
+   */
+  public function cleanComposerVendors() {
     $composer = $this->globalConfig->getComposerBin();
     $process = new Process("$composer show --path");
     $process->run();
