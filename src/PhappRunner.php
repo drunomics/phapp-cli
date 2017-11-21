@@ -20,6 +20,11 @@ class PhappRunner extends Runner {
   protected function initContainer(Application $app) {
     // @todo: Add support for system-level command config.
     $container = Robo::createDefaultContainer($this->input(), $this->output(), $app);
+
+    // Only register explict annotated commands.
+    $container->get('commandFactory')
+      ->setIncludeAllPublicMethods(FALSE);
+
     $this->setContainer($container);
     $this->installRoboHandlers();
     Robo::setContainer($container);

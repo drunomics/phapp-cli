@@ -27,6 +27,8 @@ class SetupCommands extends PhappCommandBase  {
    *   (optional) The phapp's environment to setup; e.g., live, test or local.
    *   If not specified, the environment variable PHAPP_ENV must be set
    *   accordingly.
+   *
+   * @command setup
    */
   public function setup($env = NULL) {
     if ($env) {

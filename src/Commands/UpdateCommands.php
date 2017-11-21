@@ -17,6 +17,8 @@ class UpdateCommands extends PhappCommandBase  {
    *
    * @option bool $build Build before running an update if the app is in
    *   development mode.
+   *
+   * @command update
    */
   public function update(array $options = ['build' => TRUE]) {
     $collection = $this->collectionBuilder();

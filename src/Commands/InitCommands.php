@@ -23,6 +23,8 @@ class InitCommands extends PhappCommandBase  {
    *
    * @param string $name
    *   (optional) The project's machine readable name.
+   *
+   * @command init:manifest
    */
   public function initManifest($name = '') {
     $instance = PhappManifest::discoverInstance();

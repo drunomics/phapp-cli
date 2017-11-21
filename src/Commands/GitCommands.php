@@ -65,8 +65,6 @@ class GitCommands extends PhappCommandBase  {
    * @param string $branch
    *   The branch to pull.
    * @option string $remote The remote to pull from. Defaults to all.
-   *
-   * @command false
    */
   public function pullBranch($branch, $options = ['remote' => 'all']) {
     $this->ensureGitWorkspaceIsClean();
@@ -192,8 +190,6 @@ class GitCommands extends PhappCommandBase  {
 
   /**
    * Ensures the current git workspace is clean.
-   *
-   * @command false
    */
   public function ensureGitWorkspaceIsClean() {
     $result = $this->_execSilent('/bin/bash -c "test -n "$(git status --porcelain)""');
@@ -215,8 +211,6 @@ class GitCommands extends PhappCommandBase  {
    *   (optional) The remote name or repository url. Defaults to 'origin'.
    *
    * @return bool
-   *
-   * @command false
    */
   public function branchExists($branch, $repository = 'origin') {
     $result = $this->_execSilent("/bin/bash -c 'git branch --list -r $repository/$branch | grep $branch -q'");

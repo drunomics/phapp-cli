@@ -15,6 +15,8 @@ class StatusCommands extends PhappCommandBase  {
    *
    * If the application is not installed, the command exits with an error code
    * of 1.
+   *
+   * @command status
    */
   public function status() {
     $command = $this->phappManifest->getCommand('status');
