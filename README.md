@@ -5,6 +5,7 @@ Provides standardized console commands for PHP applications.
 ## Requirements
 
  * Git version >= 2.0
+ * Bash 4.*
 
 ## Installation
 
@@ -35,21 +36,33 @@ Run
      
 ## Usage
 
-Run `phapp list` to show a list of support commands. A few important commands
-are highlighted below:
+Run `phapp list` to show a list of support commands and use `phapp command --help`
+for more information about a command. The list of currently available commands
+is:
 
+      build                 Builds the project with the current code checkout.
+      clone                 Clones a Phapp project.
+      create                Creates a new project base on a given template.
+      help                  Displays help for a command
+      init                  Initializes the app.
+      install               Installs the application.
+      list                  Lists commands
+      setup                 Setups the phapp environment.
+      status                Checks for a working and installed application.
+      update                Updates the app.
+     build
+      build:branch          Builds a given branch.
+      build:clean           Cleans all build related files.
+      build:clean:composer  Cleans all dependencies that are installed via composer.
+     git
+      git:pull              Updates local branches by pull from remote repositories.
+      git:setup-remotes     Configures Git remote repositories.
+     init
+      init:manifest         Initializes a new phapp.yml for your project.
+     self
+      self:rollback         Rolls back to the previous version after a self-update.
+      self:update           Updates the installed phar.
 
-### build
-
-  - Build the project as configured in phapp.yml:
-  
-        phapp build
-        
-    If no build command configured, phapp will just run a composer install.
-
-  - Build a certain branch and commit the build result in `build/{{ branch }}`:
-  
-        phapp build {{ branch }}
 
 ## Phapp development
 
