@@ -4,6 +4,7 @@ namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\Exception\LogicException;
 use drunomics\Phapp\PhappCommandBase;
+use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Updater;
 use Robo\Robo;
 
@@ -20,14 +21,19 @@ class SelfCommands extends PhappCommandBase {
   /**
    * Updates the installed phar.
    *
+   * @option bool $unstable Allows updating to unstable releases.
+   *
    * @command self:update
    */
-  public function selfUpdate() {
+  public function selfUpdate($options = ['unstable' => FALSE]) {
     $updater = new Updater(NULL, FALSE);
     $updater->setStrategy(Updater::STRATEGY_GITHUB);
-    $updater->getStrategy()->setPackageName('drunomics/phapp-cli');
-    $updater->getStrategy()->setPharName('phapp.phar');
-    $updater->getStrategy()->setCurrentLocalVersion(Robo::application()->getVersion());
+    $strategy = $updater->getStrategy();
+    /** @var \Humbug\SelfUpdate\Strategy\GithubStrategy $strategy */
+    $strategy->setPackageName('drunomics/phapp-cli');
+    $strategy->setPharName('phapp.phar');
+    $strategy->setCurrentLocalVersion(Robo::application()->getVersion());
+    $strategy->setStability($options['unstable'] ? GithubStrategy::ANY : GithubStrategy::STABLE);
 
     if (!\Phar::running()) {
       throw new LogicException("Unable to self-update if the application is not installed as phar.");
