@@ -283,56 +283,12 @@ class BuildCommands extends PhappCommandBase {
   public function clean() {
     $command = $this->phappManifest->getCommand('clean');
     if (!$command) {
-      // Default to cleaning composer vendors.
-      return $this->cleanComposerVendors();
+      // Default to cleaning composer vendor directory.
+      return $this->_exec("rm -rf ./vendor");
     }
     else {
       return $this->_exec($command);
     }
   }
 
-  /**
-   * Cleans all dependencies that are installed via composer.
-   *
-   * @todo: Make cleaning builds customizable.
-   *
-   * @command build:clean:composer
-   */
-  public function cleanComposerVendors() {
-    $composer = $this->globalConfig->getComposerBin();
-    $process = new Process("$composer show --path");
-    $process->run();
-
-    if (!$process->isSuccessful()) {
-      throw new \Exception("Errors while running $composer." . $process->getErrorOutput());
-    }
-
-    $dirs = [];
-    foreach (explode("\n", $process->getOutput()) as $line) {
-      $matches = [];
-      // Parse out the path from the output. The path is the second "word",
-      // after the package and some whitespace.
-      if (preg_match('/\S*\s*(\S*)/', $line, $matches)) {
-        $dirs[] = $matches[1];
-      }
-    }
-    // Remove dirs which are sub-directories of the vendor dirs and delete that
-    // instead.
-    $vendor_dir = realpath('./vendor');
-    $dirs = array_filter($dirs, function($dir) use ($vendor_dir) {
-      return $dir && strpos($dir, $vendor_dir) !== 0;
-    });
-    $dirs[] = $vendor_dir;
-
-    // Cut of the current directory and use relative paths.
-    $cwd = realpath(getcwd());
-    foreach ($dirs as &$dir) {
-      $dir = str_replace($cwd . '/', '', $dir);
-    }
-    // Ensure the current dir is not removed.
-    $dirs = array_filter($dirs, function($dir) use ($cwd) {
-      return $dir && realpath($dir) != $cwd;
-    });
-    return $this->taskDeleteDir($dirs);
-  }
 }
