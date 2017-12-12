@@ -53,7 +53,6 @@ is:
      build
       build:branch          Builds a given branch.
       build:clean           Cleans all build related files.
-      build:clean:composer  Cleans all dependencies that are installed via composer.
      git
       git:pull              Updates local branches by pull from remote repositories.
       git:setup-remotes     Configures Git remote repositories.
