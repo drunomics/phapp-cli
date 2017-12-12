@@ -28,7 +28,7 @@ class GitCommands extends PhappCommandBase  {
    */
   public function pullBranches($branch = NULL, $options = ['remote' => 'all']) {
     // Make sure all remotes are there and update them.
-    $this->setupGitRemotes(['remote' => $options['remote'], 'fetch' => TRUE]);
+    $this->setupGitRemotes(['remote' => $options['remote'], 'fetch' => TRUE, 'force' => FALSE]);
 
     if (!$branch) {
       $collection = $this->collectionBuilder()->getCollection();
@@ -159,7 +159,7 @@ class GitCommands extends PhappCommandBase  {
   /**
    * Configures Git remote repositories.
    *
-   * @option force Overwrite existing remotes if any
+   * @option force Overwrite existing remotes if any.
    * @option fetch Fetch the remote repositories after setup.
    *
    * @command git:setup-remotes
@@ -170,7 +170,7 @@ class GitCommands extends PhappCommandBase  {
       $result = $this->_execSilent('git remote get-url ' . $name);
       if ($result->getExitCode() == 0 && trim($result->getOutput()) != trim($url)) {
         if (!$options['force']) {
-          throw new LogicException("Remote $name already exists but does not point to $url.");
+          throw new LogicException("Remote $name already exists but does not point to $url. Re-run git:setup-remotes with --force to fix that.");
         }
         else {
           $this->_exec("git remote set-url $name $url");
