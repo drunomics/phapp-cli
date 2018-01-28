@@ -34,9 +34,8 @@ class InstallCommands extends PhappCommandBase  {
         $this->io()->title('Installing...');
       });
     }
-    $command = $this->phappManifest->getCommand('install');
     $collection->addTask(
-      $this->taskExec($command)
+      $this->invokeManifestCommand('install')
     );
     return $collection;
   }

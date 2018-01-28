@@ -16,6 +16,7 @@ sub-apps:
 # If command is set to '@sub-apps' the command is executed on all sub-apps, in
 # the order the sub-apps are defined.
 commands:
+  setup: @sub-apps
   build: |
     composer install --no-interaction --no-dev
   clean: |

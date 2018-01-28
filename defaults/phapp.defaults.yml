@@ -8,7 +8,9 @@ git:
     develop: develop
     build_prefix: 'build/'
     version_prefix: 'version/'
+sub-apps: []
 commands:
+  clean: rm -rf ./vendor
   build: |
     composer install --no-dev --no-interaction
   init:

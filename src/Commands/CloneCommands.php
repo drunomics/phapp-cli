@@ -49,6 +49,9 @@ class CloneCommands extends PhappCommandBase {
     $this->logger->info('Running ' . $command);
     $process = new Process($command);
     $process->enableOutput()->start();
+    $process->setTty(TRUE);
+    $process->setTimeout(3600);
+    $process->setIdleTimeout(120);
 
     foreach ($process as $output) {
       echo $output;

@@ -3,6 +3,9 @@
 namespace drunomics\Phapp;
 
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
+use drunomics\Phapp\Exception\PhappManifestMalformedException;
+use drunomics\Phapp\Task\Exec;
+use function PHPSTORM_META\elementType;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
@@ -65,30 +68,41 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     // Add the composer bin-dir to the path.
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");
-    $this->initPhappEnviromentVariables();
     return $this;
   }
 
   /**
-   * Initializes all phapp environment variables.
+   * Gets dotenv variables from the given directory.
+   *
+   * @param string $directory
+   *   (optional) The director
+   *
+   * @return string[]
+   *   The array of environment variables, keyed variable name.
    *
    * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
    *   Thrown when the environment is undefined.
    */
-  protected function initPhappEnviromentVariables() {
-    if (file_exists('.env')) {
+  protected function getPhappEnviromentVariables($directory = './') {
+    // Normalize directory paths to ahve a trailing slash.
+    $directory = rtrim($directory, '/') . '/';
+    if (file_exists($directory . '.env')) {
       $dotenv = new Dotenv();
-      $dotenv->load('.env');
+      $env_vars = $dotenv->parse(file_get_contents($directory . '.env'), $directory . '.env');
+
       // Support loading multiple dotenv "includes".
       if ($files = getenv('PHAPP_DOTENV_FILES')) {
         foreach (explode(',', $files) as $file) {
-          $dotenv->load($file);
+          $file = $directory . $file;
+          $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file), $file));
         }
       }
+      return $env_vars;
     }
-    if (!getenv('PHAPP_ENV')) {
+    if (!getenv('PHAPP_ENV') && empty($env_vars['PHAPP_ENV'])) {
       throw new PhappEnvironmentUndefinedException();
     }
+    return [];
   }
 
   /**
@@ -113,18 +127,99 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   }
 
   /**
-   * Executes a command in bash.
+   * Invokes a command from the phapp manifest.
    *
-   * @param string $command
-   *   The command to execute.
+   * @param string $command_name
+   *   The name of the command to invoke; e.g. 'setup'.
    *
-   * @return \Robo\Result
+   * @return \Robo\Contract\TaskInterface
+   *   The task for running the command.
+   *
+   * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
+   *   Thrown if some phapp manifest reference is invalid.
+   * @throws \drunomics\Phapp\Exception\PhappManifestMalformedException
+   *   Thrown if some referenced phapp manifest is malformed.
    */
-  protected function _exec($command) {
-    // @todo: Enforce piping the command through bash if the active shell is not
-    // bash.
-    return parent::_exec($command);
+  protected function invokeManifestCommand($command_name) {
+    $collection = $this->collectionBuilder();
+
+    $command = $this->phappManifest->getCommand($command_name);
+    if (!$command) {
+      $collection->addCode(function() use ($command_name) {
+        $this->say("Command <info>$command_name</info> is undefined, skipping.");
+      });
+    }
+    else {
+      // Support passing on commands to the sub-apps.
+      if (strpos(trim($command), '@sub-apps') === 0) {
+        $sub_app_dirs = $this->phappManifest->getSubAppDirectories();
+
+        foreach ($sub_app_dirs as $dir) {
+          $collection->addTask(
+            $this->invokeManifestCommandAtDirectory($command_name, $dir)
+          );
+        }
+      }
+      // Support @phapp:path/to/directory references.
+      elseif (strpos(trim($command), '@phapp:') === 0) {
+        $dir = substr(trim($command), 7);
+        if (!is_dir($dir)) {
+          throw new PhappManifestMalformedException("Invalid directory given in reference $command");
+        }
+        $collection->addTask(
+          $this->invokeManifestCommandAtDirectory($command_name, $dir)
+        );
+      }
+      else {
+        // Directly execute the given command.
+        // @todo: Ensure the command is run via bash.
+        $collection->addTask(
+          $this->taskExec($command)
+            ->envVars($this->getPhappEnviromentVariables())
+        );
+      }
+    }
+    return $collection;
   }
 
+  /**
+   * Invokes a manifest command defined at the app in the given directory.
+   *
+   * @param string $command_name
+   *   The command name.
+   * @param string $directory
+   *   The relative directory of the app.
+   *
+   * @return \Robo\Collection\CollectionBuilder
+   *   The tasks to execute
+   *
+   * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
+   *   Thrown if no phapp manifest can be found at the given directory.
+   */
+  protected function invokeManifestCommandAtDirectory($command_name, $directory) {
+    $collection = $this->collectionBuilder();
+    $manifest = PhappManifest::getInstance($directory);
+
+    $collection->addCode(function() use ($command_name, $manifest) {
+      $this->say("Executing <info>$command_name</info> for app <info>{$manifest->getName()}</info>" );
+    });
+
+    $collection->addTask(
+      $this->taskExec($manifest->getCommand($command_name))
+        ->dir($directory)
+        ->envVars($this->getPhappEnviromentVariables($directory))
+    );
+
+    return $collection;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Use our own version of the Exec task.
+   */
+  protected function taskExec($command) {
+    return $this->task(Exec::class, $command);
+  }
 
 }

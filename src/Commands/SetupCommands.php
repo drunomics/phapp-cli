@@ -37,8 +37,7 @@ class SetupCommands extends PhappCommandBase  {
     if (!getenv('PHAPP_ENV')) {
       throw new PhappEnvironmentUndefinedException();
     }
-    $command = $this->phappManifest->getCommand('setup');
-    return $this->_exec($command);
+    return $this->invokeManifestCommand('setup');
   }
 
 }

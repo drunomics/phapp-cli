@@ -34,9 +34,8 @@ class UpdateCommands extends PhappCommandBase  {
         $this->io()->title('Updating...');
       });
     }
-    $command = $this->phappManifest->getCommand('update');
     $collection->addTask(
-      $this->taskExec($command)
+      $this->invokeManifestCommand('update')
     );
     return $collection;
   }

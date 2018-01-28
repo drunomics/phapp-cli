@@ -46,7 +46,7 @@ class BuildCommands extends PhappCommandBase {
     }
 
     $collection->addTaskToCollection(
-      $this->taskExec($this->phappManifest->getCommand('build'))
+      $this->invokeManifestCommand('build')
     );
 
     // Avoid problems with git submodules.
@@ -281,14 +281,7 @@ class BuildCommands extends PhappCommandBase {
    * @command build:clean
    */
   public function clean() {
-    $command = $this->phappManifest->getCommand('clean');
-    if (!$command) {
-      // Default to cleaning composer vendor directory.
-      return $this->_exec("rm -rf ./vendor");
-    }
-    else {
-      return $this->_exec($command);
-    }
+    return $this->invokeManifestCommand('clean');
   }
 
 }

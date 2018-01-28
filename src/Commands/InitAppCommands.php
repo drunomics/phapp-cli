@@ -37,9 +37,8 @@ class InitAppCommands extends PhappCommandBase  {
         $this->io()->title('Initializing...');
       });
     }
-    $command = $this->phappManifest->getCommand('init');
     $collection->addTask(
-      $this->taskExec($command)
+      $this->invokeManifestCommand('init')
     );
     return $collection;
   }

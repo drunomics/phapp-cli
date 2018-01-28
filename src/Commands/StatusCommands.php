@@ -19,9 +19,10 @@ class StatusCommands extends PhappCommandBase  {
    * @command status
    */
   public function status() {
-    $command = $this->phappManifest->getCommand('status');
     $this->stopOnFail(FALSE);
-    $result = $this->_exec($command);
+    $result =
+      $this->invokeManifestCommand('status')
+      ->run();
     if ($result->getExitCode() != 0) {
       $return = new ResultData(ResultData::EXITCODE_ERROR, 'Application is not installed.');
     }

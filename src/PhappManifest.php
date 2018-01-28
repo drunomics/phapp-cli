@@ -5,7 +5,6 @@ namespace drunomics\Phapp;
 use drunomics\Phapp\Exception\PhappInstanceNotFoundException;
 use drunomics\Phapp\Exception\PhappManifestMalformedException;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -14,11 +13,11 @@ use Symfony\Component\Yaml\Parser;
 class PhappManifest {
 
   /**
-   * The config file.
+   * Information about the manifest file.
    *
    * @var \Symfony\Component\Finder\SplFileInfo
    */
-  protected $configFile;
+  protected $file;
 
   /**
    * The content of the config file.
@@ -28,17 +27,13 @@ class PhappManifest {
   protected $config;
 
   /**
-   * Finds a phapp directory based upon the current working directory.
+   * Finds a phapp manifest based upon the current working directory.
    *
-   * @return static|null
-   *   The phapp instance or NULL if no instance can be found.
-   *
-   * @throws \Symfony\Component\Yaml\Exception\ParseException
-   *   Thrown if the phapp.yml file found is invalid.
+   * @return \SplFileInfo|null
+   *   The info about the manifest file or NULL if no instance can be found.
    */
   public static function discoverInstance() {
     $finder = new Finder();
-    $yamlParser = new Parser();
 
     // @todo: Add multiple parent Git dirs here.
     $finder->files()->name('phapp.yml')->in(getcwd())->depth('== 0');
@@ -50,27 +45,42 @@ class PhappManifest {
     foreach ($finder as $file) {
       break;
     }
-    $config = $yamlParser->parse(file_get_contents($file->getRealPath()));
-    return new static($config, $file);
+    return $file;
   }
 
   /**
-   * Gets a phapp instance based upon the current working directory.
+   * Gets a phapp manifest for the given directory.
+   *
+   * If not directory is given, the right phapp instance is discovered based
+   * upon the current working directory.
+   *
+   * @param string $directory
+   *   (optional) The directory of which to read the phapp manifest from.
    *
    * @return static
-   *   The phapp instance.
+   *   The phapp manifest instance.
    *
    * @throws \Symfony\Component\Yaml\Exception\ParseException
    *   Thrown if the phapp.yml file found is invalid.
    * @throws \drunomics\Phapp\Exception\PhappInstanceNotFoundException
    *   If no phapp.yml could be found.
    */
-  public static function getInstance() {
-    $phapp = static::discoverInstance();
-    if (!$phapp) {
-      throw new PhappInstanceNotFoundException();
+  public static function getInstance($directory = NULL) {
+    if (isset($directory)) {
+      $file = new \SplFileInfo($directory . '/phapp.yml');
+      if (!$file->isFile()) {
+        throw new PhappInstanceNotFoundException('Uanble to find phapp.yml at '. $directory);
+      }
     }
-    return $phapp;
+    else {
+      $file = static::discoverInstance();
+      if (!$file || !$file->isFile()) {
+        throw new PhappInstanceNotFoundException($directory);
+      }
+    }
+    $yamlParser = new Parser();
+    $config = $yamlParser->parse(file_get_contents($file->getRealPath()));
+    return new static($config, $file);
   }
 
   /**
@@ -78,10 +88,13 @@ class PhappManifest {
    *
    * @param array $config
    *   The parsed phapp.yml file contents.
-   * @param \Symfony\Component\Finder\SplFileInfo $configFile
+   * @param \SplFileInfo $configFile
    *   The config file info.
+   *
+   * @throws \drunomics\Phapp\Exception\PhappManifestMalformedException
+   *   Thrown when validation fails.
    */
-  public function __construct(array $config, SplFileInfo $configFile) {
+  public function __construct(array $config, \SplFileInfo $configFile) {
     $yamlParser = new Parser();
     $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
     $this->config = array_replace_recursive($default_config, $config);
@@ -120,6 +133,16 @@ class PhappManifest {
    */
   public function getName() {
     return $this->config['name'];
+  }
+
+  /**
+   * Gets all directories containing sub-apps.
+   *
+   * @return string[]
+   *   The relative directories containing sub-apps.
+   */
+  public function getSubAppDirectories() {
+    return $this->config['sub_apps'];
   }
 
   /**
