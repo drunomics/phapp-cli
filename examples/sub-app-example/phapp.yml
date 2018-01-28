@@ -2,25 +2,21 @@
 ---
 # A machine readable name of your application. Valid names consist of
 # alphanumeric characters, dashes and underscores only.
-name: example-app
+name: example-sub-app
 # A human readable description of your application.
 description: |
   The app description.
-git:
-  # The main Git repository url.
-  url: git@github.com/vendor/project.git
-  # A list of git mirrors of the main repository.
-  # Mirrors are kept up to date when pushing changes.
-  mirrors:
-    mirror1: mirror1-url
+
+# Commands for the sub-app. If a command is false, the respective
+# command on the main app is invoked; e.g. if building happens once at the main
+# app only.
 commands:
   setup: |
     ln -sfr web/sites/default/settings.$PHAPP_ENV.php web/sites/default/settings.php
     ln -sfr env/$PHAPP_ENV .env
-  build: |
-    composer install --no-interaction --no-dev
-  clean: |
-    rm -rf vendor
+  # Building happens at the main app.
+  build: @phapp:../
+  clean: @phapp:../
   status: |
     drush status --fields=bootstrap | grep 'bootstrap' -q
   init: |

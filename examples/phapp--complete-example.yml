@@ -28,15 +28,19 @@ git:
     build_prefix: 'build/'
     # The prefix to use when tagging released versions.
     version_prefix: 'version/'
+
+# A list of relative directories that contain sub-applications.
+sub_apps: []
+# - path/to/sub-app
+
 commands:
   setup: |
     ln -sfr web/sites/default/settings.$PHAPP_ENV.php web/sites/default/settings.php
     ln -sfr env/$PHAPP_ENV .env
   build: |
     composer install --no-interaction --no-dev
-  clean:
-    # todo: Add in an easy way to re-use build:clean:composer. Defaults to
-    # build:clean:composer it it remains undefined.
+  clean: |
+    rm -rf vendor
   status: |
     drush status --fields=bootstrap | grep 'bootstrap' -q
   init: |

@@ -1,0 +1,26 @@
+# An example phapp using sub-apps.
+---
+# A machine readable name of your application. Valid names consist of
+# alphanumeric characters, dashes and underscores only.
+name: example-app
+# A human readable description of your application.
+description: |
+  The app description.
+git:
+  # The main Git repository url.
+  url: git@github.com/vendor/project.git
+
+sub-apps:
+  - sub-app-example
+
+# If command is set to '@sub-apps' the command is executed on all sub-apps, in
+# the order the sub-apps are defined.
+commands:
+  build: |
+    composer install --no-interaction --no-dev
+  clean: |
+    rm -rf vendor
+  status: @sub-apps
+  init: @sub-apps
+  install: @sub-apps
+  update: @sub-apps
