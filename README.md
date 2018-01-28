@@ -87,6 +87,7 @@ More environment variables which are pending definition:
 - PHAPP_ENV_DUMP_DIR
 - PHAPP_ENV_DUMP_DB_FILENAME
 - PHAPP_ENV_MYSQL_DEFAULT_DATABASE
+- PHAPP_BASE_URL
 
 ## Phapp development
 
