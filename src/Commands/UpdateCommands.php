@@ -15,8 +15,7 @@ class UpdateCommands extends PhappCommandBase  {
   /**
    * Updates the app.
    *
-   * @option bool $build Build before running an update if the app is in
-   *   development mode.
+   * @option bool $build Build before running an update.
    *
    * @command update
    */

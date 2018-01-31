@@ -18,15 +18,14 @@ class InitAppCommands extends PhappCommandBase  {
    * Initializes the app as defined by the app; i.e., either per installing from
    * scratch or importing a database dump.
    *
-   * @option bool $build Build before running an update if the app is in
-   *   development mode.
+   * @option bool $build Build before initializing the app.
    *
    * @command init
    */
   public function initApp(array $options = ['build' => TRUE]) {
     $collection = $this->collectionBuilder();
     $collection->setProgressIndicator(NULL);
-    if (getenv('PHAPP_ENV_MODE') == 'development' && $options['build']) {
+    if ($options['build']) {
       $collection->addCode(function() {
         $this->io()->title('Building...');
       });
