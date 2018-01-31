@@ -10,6 +10,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -85,24 +86,31 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    */
   protected function getPhappEnviromentVariables($directory = './') {
     // Normalize directory paths to ahve a trailing slash.
-    $directory = rtrim($directory, '/') . '/';
-    if (file_exists($directory . '.env')) {
-      $dotenv = new Dotenv();
-      $env_vars = $dotenv->parse(file_get_contents($directory . '.env'), $directory . '.env');
+    $directory = rtrim($directory, '/');
 
-      // Support loading multiple dotenv "includes".
-      if ($files = getenv('PHAPP_DOTENV_FILES')) {
-        foreach (explode(',', $files) as $file) {
-          $file = $directory . $file;
-          $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file), $file));
-        }
-      }
-      return $env_vars;
+    $finder = new Finder();
+    $finder->files()
+      ->name('.env')
+      ->name('.*.env')
+      ->ignoreDotFiles(FALSE)
+      ->in($directory)
+      ->depth('== 0');
+
+    if ($finder->count() == 0) {
+      return [];
     }
+
+    $env_vars = [];
+    foreach ($finder as $file) {
+      $dotenv = new Dotenv();
+      $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file->getPathname()), $file->getPathname()));
+    }
+
+    // Ensure the PHAPP_ENV variable will be set.
     if (!getenv('PHAPP_ENV') && empty($env_vars['PHAPP_ENV'])) {
       throw new PhappEnvironmentUndefinedException();
     }
-    return [];
+    return $env_vars;
   }
 
   /**
