@@ -22,7 +22,7 @@ class UpdateCommands extends PhappCommandBase  {
   public function update(array $options = ['build' => TRUE]) {
     $collection = $this->collectionBuilder();
     $collection->setProgressIndicator(NULL);
-    if (getenv('PHAPP_ENV_MODE') == 'development' && $options['build']) {
+    if ($options['build']) {
       $collection->addCode(function() {
         $this->io()->title('Building...');
       });
