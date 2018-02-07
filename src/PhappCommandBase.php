@@ -5,7 +5,6 @@ namespace drunomics\Phapp;
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\Exception\PhappManifestMalformedException;
 use drunomics\Phapp\Task\Exec;
-use function PHPSTORM_META\elementType;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
