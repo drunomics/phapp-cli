@@ -136,6 +136,15 @@ class PhappManifest {
   }
 
   /**
+   * Gets the environment variables.
+   *
+   * @return array
+   */
+  public function getEnvironment() {
+    return $this->config['environment'] ?? [];
+  }
+
+  /**
    * Gets all directories containing sub-apps.
    *
    * @return string[]
