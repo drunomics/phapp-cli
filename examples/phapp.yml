@@ -43,3 +43,7 @@ commands:
       drush cim -y && drush cr
     fi
     drush locale:update
+# Environmental variables for the application. All variables
+# listed here will be injected to the commands.
+environment:
+  DRUSH_VERSION: 8.1.15
