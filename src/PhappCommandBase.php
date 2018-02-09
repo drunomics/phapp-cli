@@ -102,8 +102,9 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     }
 
     $env_vars = [];
-    // Add env vars from manifest.
-    if ($manifest) {
+    // Add env vars from given manifest.
+    // Fallback to the root manifest if no other is provided.
+    if ($manifest || $manifest = $this->phappManifest) {
       $env_vars = array_replace($env_vars, $manifest->getEnvironment());
     }
     foreach ($finder as $file) {
