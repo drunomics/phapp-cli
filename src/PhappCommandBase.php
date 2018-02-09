@@ -34,13 +34,6 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected $phappManifest;
 
   /**
-   * The manifests for the subapps (directories other than the default './').
-   *
-   * @var \drunomics\Phapp\PhappManifest[]
-   */
-  protected $subappManifests = [];
-
-  /**
    * The global phapp config.
    *
    * @var \drunomics\Phapp\GlobalConfig
