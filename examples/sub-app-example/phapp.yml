@@ -39,3 +39,7 @@ commands:
       drush cim -y && drush cr
     fi
     drush locale:update
+# Environmental variables for the sub-app. All variables listed here
+# will be injected to the commands of the respective sub-app.
+environment:
+  SITE: my-subapp-instance

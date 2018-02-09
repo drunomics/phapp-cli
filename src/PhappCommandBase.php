@@ -76,6 +76,8 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    *
    * @param string $directory
    *   (optional) The director
+   * @param \drunomics\Phapp\PhappManifest $manifest
+   *   (optional) Manifest
    *
    * @return string[]
    *   The array of environment variables, keyed variable name.
@@ -83,7 +85,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
    *   Thrown when the environment is undefined.
    */
-  protected function getPhappEnviromentVariables($directory = './') {
+  protected function getPhappEnviromentVariables($directory = './', $manifest = NULL) {
     // Normalize directory paths to ahve a trailing slash.
     $directory = rtrim($directory, '/');
 
@@ -100,7 +102,13 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     }
 
     $env_vars = [];
+    // Add env vars from given manifest.
+    // Fallback to the root manifest if no other is provided.
+    if ($manifest || $manifest = $this->phappManifest) {
+      $env_vars = array_replace($env_vars, $manifest->getEnvironment());
+    }
     foreach ($finder as $file) {
+      // Add dotenv vars.
       $dotenv = new Dotenv();
       $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file->getPathname()), $file->getPathname()));
     }
@@ -214,7 +222,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $collection->addTask(
       $this->taskExec($manifest->getCommand($command_name))
         ->dir($directory)
-        ->envVars($this->getPhappEnviromentVariables($directory))
+        ->envVars($this->getPhappEnviromentVariables($directory, $manifest))
     );
 
     return $collection;
