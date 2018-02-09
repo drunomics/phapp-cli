@@ -83,6 +83,8 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    *
    * @param string $directory
    *   (optional) The director
+   * @param \drunomics\Phapp\PhappManifest $manifest
+   *   (optional) Manifest
    *
    * @return string[]
    *   The array of environment variables, keyed variable name.
@@ -90,7 +92,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
    * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
    *   Thrown when the environment is undefined.
    */
-  protected function getPhappEnviromentVariables($directory = './') {
+  protected function getPhappEnviromentVariables($directory = './', $manifest = NULL) {
     // Normalize directory paths to ahve a trailing slash.
     $directory = rtrim($directory, '/');
 
@@ -108,10 +110,9 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
 
     $env_vars = [];
     foreach ($finder as $file) {
-      // Add env vars from subapp manifest.
-      $subappManifest = $this->getSubappManifest($directory);
-      if ($subappManifest) {
-        $env_vars = array_replace($env_vars, $subappManifest->getEnvironment());
+      // Add env vars from manifest.
+      if ($manifest) {
+        $env_vars = array_replace($env_vars, $manifest->getEnvironment());
       }
       // Add dotenv vars.
       $dotenv = new Dotenv();
@@ -123,32 +124,6 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
       throw new PhappEnvironmentUndefinedException();
     }
     return $env_vars;
-  }
-
-  /**
-   * Set manifest for subapp directory.
-   *
-   * @param string $directory
-   *   Subapp manifest directory.
-   * @param $manifest
-   *   Manifest.
-   */
-  protected function setSubappManifest($directory = './', $manifest) {
-    $directory = rtrim($directory, '/');
-    if ($directory != '.') {
-      $this->subappManifests[$directory] = $manifest;
-    }
-  }
-
-  /*
-   * Get subapp manifest
-   *
-   * @param string $directory
-   *   Subapp manifest directory.
-   */
-  protected function getSubappManifest($directory = './') {
-    $directory = rtrim($directory, '/');
-    return $this->subappManifests[$directory] ?? FALSE;
   }
 
   /**
@@ -245,7 +220,6 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected function invokeManifestCommandAtDirectory($command_name, $directory) {
     $collection = $this->collectionBuilder();
     $manifest = PhappManifest::getInstance($directory);
-    $this->setSubappManifest($directory, $manifest);
 
     $collection->addCode(function() use ($command_name, $manifest) {
       $this->say("Executing <info>$command_name</info> for app <info>{$manifest->getName()}</info>" );
@@ -254,7 +228,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $collection->addTask(
       $this->taskExec($manifest->getCommand($command_name))
         ->dir($directory)
-        ->envVars($this->getPhappEnviromentVariables($directory))
+        ->envVars($this->getPhappEnviromentVariables($directory, $manifest))
     );
 
     return $collection;
