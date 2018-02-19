@@ -86,18 +86,18 @@ Variable | Description | Example value |
 More environment variables which are pending definition:
 
 ### Database connection.
-PHAPP_ENV_MYSQL_DEFAULT_DATABASE=database
-PHAPP_ENV_MYSQL_DEFAULT_USERNAME=user
-PHAPP_ENV_MYSQL_DEFAULT_PASSWORD=pass
-PHAPP_ENV_MYSQL_DEFAULT_HOST=localhost
-PHAPP_ENV_MYSQL_DEFAULT_PORT="3306"
+    PHAPP_ENV_MYSQL_DEFAULT_DATABASE=database
+    PHAPP_ENV_MYSQL_DEFAULT_USERNAME=user
+    PHAPP_ENV_MYSQL_DEFAULT_PASSWORD=pass
+    PHAPP_ENV_MYSQL_DEFAULT_HOST=localhost
+    PHAPP_ENV_MYSQL_DEFAULT_PORT="3306"
 
 ### Various other variables provided by the environment.
-PHAPP_BASE_URL=https://example.com
-PHAPP_ENV_DUMP_DIR="/data/mysql_dumps/sync"
-PHAPP_ENV_DUMP_DB_FILENAME="${PHAPP_ENV_MYSQL_DEFAULT_DATABASE}-$(date -d "1 day ago" +%Y%m%d).sql.gz"
-PHAPP_ENV_HTTPS _ENABLED=1 (1|0)
-PHAPP_ENV_HTTPS_REQUIRED=1 (1|0)
+    PHAPP_BASE_URL=https://example.com
+    PHAPP_ENV_DUMP_DIR="/data/mysql_dumps/sync"
+    PHAPP_ENV_DUMP_DB_FILENAME="${PHAPP_ENV_MYSQL_DEFAULT_DATABASE}-$(date -d "1 day ago" +%Y%m%d).sql.gz"
+    PHAPP_ENV_HTTPS _ENABLED=1 (1|0)
+    PHAPP_ENV_HTTPS_REQUIRED=1 (1|0)
 
 ## Phapp development
 
