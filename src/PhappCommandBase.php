@@ -97,7 +97,8 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
       ->in($directory)
       ->depth('== 0');
 
-    if ($finder->count() == 0) {
+    // If no env files found and also no subsite manifest was provided, exit.
+    if ($finder->count() == 0 && !$manifest) {
       return [];
     }
 
