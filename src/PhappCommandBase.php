@@ -97,17 +97,18 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
       ->in($directory)
       ->depth('== 0');
 
-    // If no env files found and also no subsite manifest was provided, exit.
-    if ($finder->count() == 0 && !$manifest) {
-      return [];
-    }
-
     $env_vars = [];
-    // Add env vars from given manifest.
+    // Try to extract env variables from given manifest.
     // Fallback to the root manifest if no other is provided.
     if ($manifest || $manifest = $this->phappManifest) {
       $env_vars = array_replace($env_vars, $manifest->getEnvironment());
     }
+    // Exit, if no dotenv files found and no env variables provided in manifest.
+    if ($finder->count() == 0 && !$env_vars) {
+      return $env_vars;
+    }
+
+    // Extract env vars from dotenv files.
     foreach ($finder as $file) {
       // Add dotenv vars.
       $dotenv = new Dotenv();
