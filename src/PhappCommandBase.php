@@ -118,7 +118,11 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     foreach ($finder as $file) {
       // Add dotenv vars.
       $dotenv = new Dotenv();
-      $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file->getPathname()), $file->getPathname()));
+      // Parse dotenv vars.
+      $parsed_env_vars = $dotenv->parse(file_get_contents($file->getPathname()), $file->getPathname());
+      // Populate them to make sure all of them are available for next parsing.
+      $dotenv->populate($parsed_env_vars);
+      $env_vars = array_replace($env_vars, $parsed_env_vars);
     }
 
     // Ensure the PHAPP_ENV variable will be set.
