@@ -89,13 +89,19 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     // Normalize directory paths to ahve a trailing slash.
     $directory = rtrim($directory, '/');
 
+    // Abstract function to sort the search result alphabetically by filename.
+    $sort = function (\SplFileInfo $first, \SplFileInfo $second) {
+      return $first->getBasename() < $second->getBasename() ? -1 : 1;
+    };
+
     $finder = new Finder();
     $finder->files()
       ->name('.env')
       ->name('.*.env')
       ->ignoreDotFiles(FALSE)
       ->in($directory)
-      ->depth('== 0');
+      ->depth('== 0')
+      ->sort($sort);
 
     $env_vars = [];
     // Try to extract env variables from given manifest.
