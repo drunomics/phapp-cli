@@ -6,7 +6,6 @@ use drunomics\Phapp\PhappCommandBase;
 use drunomics\Phapp\ServiceUtil\GitCommandsTrait;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\Process;
 
 /**
  * Builds an app.
