@@ -89,13 +89,19 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     // Normalize directory paths to ahve a trailing slash.
     $directory = rtrim($directory, '/');
 
+    // Abstract function to sort the search result alphabetically by filename.
+    $sort = function (\SplFileInfo $first, \SplFileInfo $second) {
+      return $first->getBasename() < $second->getBasename() ? -1 : 1;
+    };
+
     $finder = new Finder();
     $finder->files()
       ->name('.env')
       ->name('.*.env')
       ->ignoreDotFiles(FALSE)
       ->in($directory)
-      ->depth('== 0');
+      ->depth('== 0')
+      ->sort($sort);
 
     $env_vars = [];
     // Try to extract env variables from given manifest.
@@ -108,12 +114,14 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
       return $env_vars;
     }
 
-    // Extract env vars from dotenv files.
+    $data = '';
+    // Extract all the data from env files.
     foreach ($finder as $file) {
-      // Add dotenv vars.
-      $dotenv = new Dotenv();
-      $env_vars = array_replace($env_vars, $dotenv->parse(file_get_contents($file->getPathname()), $file->getPathname()));
+      $data .= file_get_contents($file->getPathname());
     }
+    // Parse the env variables from the data.
+    $dotenv = new Dotenv();
+    $env_vars = array_replace($env_vars, $dotenv->parse($data));
 
     // Ensure the PHAPP_ENV variable will be set.
     if (!getenv('PHAPP_ENV') && empty($env_vars['PHAPP_ENV'])) {
