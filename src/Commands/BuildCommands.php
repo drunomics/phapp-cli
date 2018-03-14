@@ -157,7 +157,7 @@ class BuildCommands extends PhappCommandBase {
     // Deprecated - Fallback for older projects.
     // May be removed in future.
     elseif ($symfony_fs->exists('.build-gitignore')) {
-      $this->io->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
+      $this->io()->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
       $this->say('Found .build-gitingore - applying it.');
       $collection->addTask(
         $this->taskExec('cp .build-gitignore .gitignore')
