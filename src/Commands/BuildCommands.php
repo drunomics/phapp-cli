@@ -34,10 +34,14 @@ class BuildCommands extends PhappCommandBase {
    * @param $options
    *   The command options.
    *
-   * @return \Robo\Collection\Collection
-   *   The collection containing the build commands.
+   * @param bool $removeGitFolders
+   *   Whether git folders should be removed.
+   *
+   * @return \Robo\Collection\CollectionBuilder The collection containing the build commands.*   The collection containing the build commands.
+   * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
+   * @throws \drunomics\Phapp\Exception\PhappManifestMalformedException
    */
-  protected function doBuild($options) {
+  protected function doBuild($options, $removeGitFolders = FALSE) {
     $collection = $this->collectionBuilder();
 
     if ($options['clean']) {
@@ -48,28 +52,30 @@ class BuildCommands extends PhappCommandBase {
       $this->invokeManifestCommand('build')
     );
 
-    // Avoid problems with git submodules.
-    $collection->addCode(
-      function() {
-        $finder = new Finder();
-        $directories = $finder->directories()
-          ->name('.git')
-          ->ignoreVCS(FALSE)
-          ->ignoreDotFiles(FALSE)
-          ->in(getcwd());
+    if ($removeGitFolders) {
+      // Avoid problems with git submodules.
+      $collection->addCode(
+        function() {
+          $finder = new Finder();
+          $directories = $finder->directories()
+            ->name('.git')
+            ->ignoreVCS(FALSE)
+            ->ignoreDotFiles(FALSE)
+            ->in(getcwd());
 
-        $dirs = [];
-        foreach ($directories as $dir) {
-          if ($dir->getRelativePath() != '') {
-            $dirs[] = $dir->getPathname();
+          $dirs = [];
+          foreach ($directories as $dir) {
+            if ($dir->getRelativePath() != '') {
+              $dirs[] = $dir->getPathname();
+            }
+          }
+          if ($dirs) {
+            $this->say("Removing .git directories to avoid troubles with git submodules");
+            $this->taskDeleteDir($dirs)->run();
           }
         }
-        if ($dirs) {
-          $this->say("Removing .git directories to avoid troubles with git submodules");
-          $this->taskDeleteDir($dirs)->run();
-        }
-      }
-    );
+      );
+    }
 
     return $collection;
   }
@@ -171,7 +177,7 @@ class BuildCommands extends PhappCommandBase {
 
     // Now, as we are on a the clean build branch, start the build.
     $collection->addTask(
-      $this->doBuild($options)
+      $this->doBuild($options, TRUE)
     );
 
     // And then commit it!
