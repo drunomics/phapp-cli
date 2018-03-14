@@ -141,7 +141,24 @@ class BuildCommands extends PhappCommandBase {
     }
 
     // Handle .gitignore.
-    if ($symfony_fs->exists('.build-gitignore')) {
+    $finder = new Finder();
+    $finder
+      ->name('.gitignore-build')
+      ->ignoreDotFiles(FALSE)
+      ->in(getcwd());
+
+    if ($finder->count() != 0) {
+      $this->say('Found .gitignore-build - applying it.');
+      foreach ($finder as $file) {
+        $filePathname = $file->getPathname();
+        $gitignorePathname = $file->getPath() . '/.gitignore';
+        $this->taskExec("$filePathname >> $gitignorePathname");
+      }
+    }
+    // Deprecated - Fallback for older projects.
+    // May be removed in future.
+    elseif ($symfony_fs->exists('.build-gitignore')) {
+      $this->io->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
       $this->say('Found .build-gitingore - applying it.');
       $collection->addTask(
         $this->taskExec('cp .build-gitignore .gitignore')
