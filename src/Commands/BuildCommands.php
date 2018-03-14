@@ -35,9 +35,10 @@ class BuildCommands extends PhappCommandBase {
    *   The command options.
    *
    * @param bool $removeGitFolders
-   *   Whether git folders should be removed.
+   *   (optional) Whether git folders should be removed.
    *
-   * @return \Robo\Collection\CollectionBuilder The collection containing the build commands.*   The collection containing the build commands.
+   * @return \Robo\Collection\CollectionBuilder The collection containing the build commands.
+   *   The collection containing the build commands.
    * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
    * @throws \drunomics\Phapp\Exception\PhappManifestMalformedException
    */
