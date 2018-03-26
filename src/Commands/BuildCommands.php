@@ -128,7 +128,7 @@ class BuildCommands extends PhappCommandBase {
       $task = $this->taskGitStack()
         ->checkout($buildBranch)
         ->exec('reset --hard')
-        ->merge($branch);
+        ->exec("merge $branchEscaped --no-edit");
       $collection->addTask($task);
     }
     else {
@@ -143,7 +143,7 @@ class BuildCommands extends PhappCommandBase {
       // Create the build branch and merge in changes.
       $task = $this->taskGitStack()
         ->exec("checkout -b $buildBranch")
-        ->merge($branchEscaped);
+        ->exec("merge $branchEscaped --no-edit");
       $collection->addTask($task);
     }
 
