@@ -4,6 +4,7 @@ namespace drunomics\Phapp\Commands;
 
 use drunomics\Phapp\PhappCommandBase;
 use drunomics\Phapp\ServiceUtil\GitCommandsTrait;
+use Robo\Exception\TaskExitException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 
@@ -146,37 +147,42 @@ class BuildCommands extends PhappCommandBase {
       $collection->addTask($task);
     }
 
-    // Handle .gitignore.
-    $finder = new Finder();
-    $finder
-      ->name('.gitignore-build')
-      ->ignoreDotFiles(FALSE)
-      ->in(getcwd());
-
-    if ($finder->count() != 0) {
-      $this->say('Found .gitignore-build - applying it.');
-      foreach ($finder as $file) {
-        $filePathname = $file->getPathname();
-        $gitignorePathname = $file->getPath() . '/.gitignore';
-        file_put_contents($gitignorePathname, file_get_contents($filePathname), FILE_APPEND);
+    // Ensure the build branch correctly contains the src branch.
+    $collection->addCode(function() use ($branch, $buildBranch) {
+      $result = $this->_execSilent("git diff $branch --exit-code");
+      if ($result->getExitCode() != 0) {
+        throw new TaskExitException($this, "Build branch $buildBranch differs from the src branch $branch. " .
+          "The build branch needs to be cleaned or resetted by deleting it."
+          , $result->getExitCode());
       }
-    }
-    // Deprecated - Fallback for older projects.
-    // May be removed in future.
-    elseif ($symfony_fs->exists('.build-gitignore')) {
-      $this->io()->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
-      $this->say('Found .build-gitingore - applying it.');
-      $collection->addTask(
-        $this->taskExec('cp .build-gitignore .gitignore')
-      );
-    }
-    elseif ($symfony_fs->exists('.gitignore')) {
-      $collection->addTask(
-        $this->taskExec('rm .gitignore')
-      );
-    }
+    });
 
-    // Now, as we are on a the clean build branch, start the build.
+    // Handle .gitignore.
+    $collection->addCode(function() use ($symfony_fs) {
+      $finder = new Finder();
+      $finder->name('.gitignore-build')->ignoreDotFiles(FALSE)->in(getcwd());
+
+      if ($finder->count() != 0) {
+        foreach ($finder as $file) {
+          $filePathname = $file->getPathname();
+          $this->say("Found $filePathname - applying it.");
+          file_put_contents($file->getPath() . '/.gitignore', file_get_contents($filePathname), FILE_APPEND);
+        }
+      }
+      // Deprecated - Fallback for older projects.
+      // May be removed in future.
+      elseif ($symfony_fs->exists('.build-gitignore')) {
+        $this->io()
+          ->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
+        $this->say('Found .build-gitingore - applying it.');
+        $this->taskExec('cp .build-gitignore .gitignore')->run();
+      }
+      elseif ($symfony_fs->exists('.gitignore')) {
+        $this->taskExec('rm .gitignore')->run();
+      }
+    });
+
+    // Now, as we are on a the clean and prepared build branch, start the build.
     $collection->addTask(
       $this->doBuild($options, TRUE)
     );
