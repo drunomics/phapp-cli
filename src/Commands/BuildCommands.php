@@ -151,7 +151,9 @@ class BuildCommands extends PhappCommandBase {
     $collection->addCode(function() use ($branch, $buildBranch) {
       $this->say("Ensure build branch is in sync with the src branch...");
       $result = $this->_execSilent("git checkout $branch && \
-        # Get the files from the build branch.
+        # Remove all tracked files and replace them with files from the build
+        # branch.
+        git ls-files | grep -v '.gitignore' | xargs rm -f && \
         git checkout $buildBranch -- . && \
         # Remove the files from the stage.
         git reset -- && \
