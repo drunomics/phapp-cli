@@ -149,7 +149,17 @@ class BuildCommands extends PhappCommandBase {
 
     // Ensure the build branch correctly contains the src branch.
     $collection->addCode(function() use ($branch, $buildBranch) {
-      $result = $this->_execSilent("git diff $branch --exit-code");
+      $this->say("Ensure build branch is in sync with the src branch...");
+      $result = $this->_execSilent("git checkout $branch && \
+        # Get the files from the build branch.
+        git checkout $buildBranch -- . && \
+        # Remove the files from the stage.
+        git reset -- && \
+        # Ensure workspace is clean as that means all src files in the build
+        # branch are equal to the src branch.
+        test ! -n \"$(git status --porcelain)\" && \
+        # If all is ok, go back to the build branch.
+        git checkout $buildBranch");
       if ($result->getExitCode() != 0) {
         throw new TaskExitException($this, "Build branch $buildBranch differs from the src branch $branch. " .
           "The build branch needs to be cleaned or resetted by deleting it."
