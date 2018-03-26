@@ -204,7 +204,7 @@ class BuildCommands extends PhappCommandBase {
     );
 
     // And then commit it!
-    $commit_hash = $this->_execSilent("git rev-parse HEAD")->getOutput();
+    $commit_hash = $this->_execSilent("git rev-parse $branch")->getOutput();
     $commit_hash = trim($commit_hash);
 
     $collection->addCode(function () use (&$gitignore_files, $branchEscaped, $commit_hash) {
