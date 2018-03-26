@@ -158,7 +158,7 @@ class BuildCommands extends PhappCommandBase {
       foreach ($finder as $file) {
         $filePathname = $file->getPathname();
         $gitignorePathname = $file->getPath() . '/.gitignore';
-        $this->taskExec("cat $filePathname >> $gitignorePathname");
+        file_put_contents($gitignorePathname, file_get_contents($filePathname), FILE_APPEND);
       }
     }
     // Deprecated - Fallback for older projects.
