@@ -157,8 +157,11 @@ class BuildCommands extends PhappCommandBase {
       }
     });
 
-    // Handle .gitignore.
-    $collection->addCode(function() use ($symfony_fs) {
+    // Handle .gitignore files.
+    // Keep track of modified ignore files so we can undo changes later.
+    $gitignore_files = [];
+
+    $collection->addCode(function() use ($symfony_fs, &$gitignore_files) {
       $finder = new Finder();
       $finder->name('.gitignore-build')->ignoreDotFiles(FALSE)->in(getcwd());
 
@@ -166,6 +169,7 @@ class BuildCommands extends PhappCommandBase {
         foreach ($finder as $file) {
           $filePathname = $file->getPathname();
           $this->say("Found $filePathname - applying it.");
+          $gitignore_files[] = $file->getPath() . '/.gitignore';
           file_put_contents($file->getPath() . '/.gitignore', file_get_contents($filePathname), FILE_APPEND);
         }
       }
@@ -176,9 +180,11 @@ class BuildCommands extends PhappCommandBase {
           ->warning('Deprecation warning: .build-gitingore is no longer supported, use .gitignore-build instead.');
         $this->say('Found .build-gitingore - applying it.');
         $this->taskExec('cp .build-gitignore .gitignore')->run();
+        $gitignore_files[] = getcwd() . '/.gitignore';
       }
       elseif ($symfony_fs->exists('.gitignore')) {
         $this->taskExec('rm .gitignore')->run();
+        $gitignore_files[] = getcwd() . '/.gitignore';
       }
     });
 
@@ -191,13 +197,19 @@ class BuildCommands extends PhappCommandBase {
     $commit_hash = $this->_execSilent("git rev-parse HEAD")->getOutput();
     $commit_hash = trim($commit_hash);
 
-    $task = $this->taskGitStack()
-      ->exec("add -A")
+    $collection->addCode(function () use (&$gitignore_files, $branchEscaped, $commit_hash) {
+      $task = $this->taskGitStack()
+        ->exec("add -A");
+      // To ensure files of src branches match with the files in build branches,
+      // do not commit changes to .gitignore files.
+      foreach ($gitignore_files as $gitignore_file) {
+        $task->exec("reset HEAD $gitignore_file");
+      }
       // Note that git commit uses ' already, so we remove ours. Also, we allow
       // empty commits in case no assets were changed the merge might be enough.
-      ->commit(sprintf("Build %s commit %s.", trim($branchEscaped, '\''), trim($commit_hash, '\'')), '--allow-empty --no-verify');
-
-    $collection->addTask($task);
+      $task->commit(sprintf("Build %s commit %s.", trim($branchEscaped, '\''), trim($commit_hash, '\'')), '--allow-empty --no-verify');
+      $task->run();
+    });
 
     $collection->completionCode(
       function() use ($buildBranch) {
