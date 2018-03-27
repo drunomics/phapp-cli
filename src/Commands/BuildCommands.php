@@ -153,7 +153,7 @@ class BuildCommands extends PhappCommandBase {
       $result = $this->_execSilent("git checkout $branch && \
         # Remove all tracked files and replace them with files from the build
         # branch.
-        git ls-files | grep -v '.gitignore' | xargs rm -f && \
+        git ls-files | grep -v '.gitignore' | xargs rm -rf && \
         git checkout $buildBranch -- . && \
         # Remove the files from the stage.
         git reset -- && \
