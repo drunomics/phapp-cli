@@ -37,6 +37,8 @@ commands:
   setup: |
     ln -sfr web/sites/default/settings.$PHAPP_ENV.php web/sites/default/settings.php
     ln -sfr env/$PHAPP_ENV .env
+  environment: |
+    source .env
   build: |
     composer install --no-interaction --no-dev
   clean: |

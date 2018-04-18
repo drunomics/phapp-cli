@@ -17,6 +17,8 @@ sub-apps:
 # the order the sub-apps are defined.
 commands:
   setup: @sub-apps
+  environment: |
+    source .env
   build: |
     composer install --no-interaction --no-dev
   clean: |
