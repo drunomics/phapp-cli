@@ -2,14 +2,11 @@
 
 namespace drunomics\Phapp;
 
-use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\Exception\PhappManifestMalformedException;
 use drunomics\Phapp\Task\Exec;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
-use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
