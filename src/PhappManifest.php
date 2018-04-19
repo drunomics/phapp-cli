@@ -20,11 +20,11 @@ class PhappManifest {
   protected $file;
 
   /**
-   * The content of the config file.
+   * The content of the file.
    *
    * @var mixed[]
    */
-  protected $config;
+  protected $content;
 
   /**
    * Finds a phapp manifest based upon the current working directory.
@@ -96,8 +96,8 @@ class PhappManifest {
    */
   public function __construct(array $config, \SplFileInfo $configFile) {
     $yamlParser = new Parser();
-    $default_config = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
-    $this->config = array_replace_recursive($default_config, $config);
+    $defaults = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
+    $this->content = array_replace_recursive($defaults, $config);
     $this->file = $configFile;
     $this->validate();
   }
@@ -109,10 +109,10 @@ class PhappManifest {
    *   Thrown when validation fails.
    */
   public function validate() {
-    if (empty($this->config['name'])) {
+    if (empty($this->content['name'])) {
       throw new PhappManifestMalformedException('Phapp name is required.');
     }
-    if (!preg_match('/^[a-z0-9_-]+$/', $this->config['name'])) {
+    if (!preg_match('/^[a-z0-9_-]+$/', $this->content['name'])) {
       throw new PhappManifestMalformedException('Phapp name may only contain lowercase alpha-numeric characters, dashes and underscores.');
     }
   }
@@ -132,7 +132,7 @@ class PhappManifest {
    * @return string
    */
   public function getName() {
-    return $this->config['name'];
+    return $this->content['name'];
   }
 
   /**
@@ -142,7 +142,7 @@ class PhappManifest {
    *   The relative directories containing sub-apps.
    */
   public function getSubAppDirectories() {
-    return $this->config['sub_apps'];
+    return $this->content['sub_apps'];
   }
 
   /**
@@ -155,8 +155,8 @@ class PhappManifest {
    *   The configured command string.
    */
   public function getCommand($name) {
-    if (isset($this->config['commands'][$name])) {
-      return $this->config['commands'][$name];
+    if (isset($this->content['commands'][$name])) {
+      return $this->content['commands'][$name];
     }
     return NULL;
   }
@@ -167,7 +167,7 @@ class PhappManifest {
    * @return string
    */
   public function getGitUrl() {
-    return $this->config['git']['url'];
+    return $this->content['git']['url'];
   }
 
   /**
@@ -177,7 +177,7 @@ class PhappManifest {
    *   An array of git urls, keyed by remote names.
    */
   public function getGitMirrors() {
-    return $this->config['git']['mirrors'];
+    return $this->content['git']['mirrors'];
   }
 
   /**
@@ -200,11 +200,11 @@ class PhappManifest {
    *   An array of git urls, keyed by remote names.
    */
   public function getGitBuildRepositories() {
-    if ($this->config['git']['build_repositories'] == 'all') {
+    if ($this->content['git']['build_repositories'] == 'all') {
       return $this->getGitRemotes();
     }
     else {
-      return $this->config['git']['build_repositories'];
+      return $this->content['git']['build_repositories'];
     }
   }
 
@@ -214,7 +214,7 @@ class PhappManifest {
    * @return string
    */
   public function getGitBranchProduction() {
-    return $this->config['git']['branches']['production'];
+    return $this->content['git']['branches']['production'];
   }
 
   /**
@@ -223,7 +223,7 @@ class PhappManifest {
    * @return string
    */
   public function getGitVersionTagPrefix() {
-    return $this->config['git']['branches']['version_prefix'];
+    return $this->content['git']['branches']['version_prefix'];
   }
 
   /**
@@ -232,7 +232,7 @@ class PhappManifest {
    * @return string
    */
   public function getGitBranchForBuild($source_branch) {
-    return $this->config['git']['branches']['build_prefix'] .  $source_branch;
+    return $this->content['git']['branches']['build_prefix'] .  $source_branch;
   }
 
   /**
@@ -244,7 +244,7 @@ class PhappManifest {
    * @return string
    */
   public function getGitBranchForBuildLocal($source_branch) {
-    if (!$this->config['git']['branches']['build_prefix']) {
+    if (!$this->content['git']['branches']['build_prefix']) {
       return 'build/' .  $source_branch;
     }
     return $this->getGitBranchForBuild($source_branch);
@@ -256,7 +256,17 @@ class PhappManifest {
    * @return string
    */
   public function getGitBranchDevelop() {
-    return $this->config['git']['branches']['develop'];
+    return $this->content['git']['branches']['develop'];
+  }
+
+  /**
+   * Gets the complete manifest, serialized as array.
+   *
+   * @return array
+   *   The complete manifest.
+   */
+  public function getContent() {
+    return $this->content;
   }
 
 }
