@@ -11,13 +11,6 @@ use drunomics\Phapp\PhappCommandBase;
 class SetupCommands extends PhappCommandBase  {
 
   /**
-   * {@inheritdoc}
-   */
-  protected function initPhappEnviromentVariables() {
-    // Skip init in setup.
-  }
-
-  /**
    * Setups the phapp environment.
    *
    * The application is prepared for running in the given environment. This is
