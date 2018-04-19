@@ -15,8 +15,9 @@ git:
     mirror1: mirror1-url
 commands:
   setup: |
-    ln -sfr web/sites/default/settings.$PHAPP_ENV.php web/sites/default/settings.php
-    ln -sfr env/$PHAPP_ENV .env
+    echo $PHAPP_ENV > .env
+  environment: |
+    source .env
   build: |
     composer install --no-interaction --no-dev
   clean: |
@@ -43,7 +44,3 @@ commands:
       drush cim -y && drush cr
     fi
     drush locale:update
-# Environmental variables for the application. All variables
-# listed here will be injected to the commands.
-environment:
-  DRUSH_VERSION: 8.1.15

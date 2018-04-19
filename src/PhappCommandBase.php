@@ -2,14 +2,11 @@
 
 namespace drunomics\Phapp;
 
-use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\Exception\PhappManifestMalformedException;
 use drunomics\Phapp\Task\Exec;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Tasks;
-use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -27,7 +24,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected $requiresPhappManifest = TRUE;
 
   /**
-   * The maniftest of the current phapp instance.
+   * The manifest of the current phapp instance.
    *
    * @var \drunomics\Phapp\PhappManifest|null
    */
@@ -69,65 +66,6 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $path = getenv("PATH");
     putenv("PATH=../vendor/bin/:../bin:$path");
     return $this;
-  }
-
-  /**
-   * Gets dotenv variables from the given directory.
-   *
-   * @param string $directory
-   *   (optional) The director
-   * @param \drunomics\Phapp\PhappManifest $manifest
-   *   (optional) Manifest
-   *
-   * @return string[]
-   *   The array of environment variables, keyed variable name.
-   *
-   * @throws \drunomics\Phapp\Exception\PhappEnvironmentUndefinedException
-   *   Thrown when the environment is undefined.
-   */
-  protected function getPhappEnviromentVariables($directory = './', $manifest = NULL) {
-    // Normalize directory paths to ahve a trailing slash.
-    $directory = rtrim($directory, '/');
-
-    // Abstract function to sort the search result alphabetically by filename.
-    $sort = function (\SplFileInfo $first, \SplFileInfo $second) {
-      return $first->getBasename() < $second->getBasename() ? -1 : 1;
-    };
-
-    $finder = new Finder();
-    $finder->files()
-      ->name('.env')
-      ->name('.*.env')
-      ->ignoreDotFiles(FALSE)
-      ->in($directory)
-      ->depth('== 0')
-      ->sort($sort);
-
-    $env_vars = [];
-    // Try to extract env variables from given manifest.
-    // Fallback to the root manifest if no other is provided.
-    if ($manifest || $manifest = $this->phappManifest) {
-      $env_vars = array_replace($env_vars, $manifest->getEnvironment());
-    }
-    // Exit, if no dotenv files found and no env variables provided in manifest.
-    if ($finder->count() == 0 && !$env_vars) {
-      return $env_vars;
-    }
-
-    $data = '';
-    // Extract all the data from env files.
-    foreach ($finder as $file) {
-      $data .= file_get_contents($file->getPathname());
-    }
-    // Parse the env variables from the data.
-    $dotenv = new Dotenv();
-    $env_vars = array_replace($env_vars, $dotenv->parse($data));
-
-    // Ensure the PHAPP_ENV variable will be set.
-    if (!getenv('PHAPP_ENV') && empty($env_vars['PHAPP_ENV'])) {
-      throw new PhappEnvironmentUndefinedException();
-    }
-    return $env_vars;
   }
 
   /**
@@ -200,12 +138,13 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
         // @todo: Ensure the command is run via bash.
         $collection->addTask(
           $this->taskExec($command)
-            ->envVars($this->getPhappEnviromentVariables())
+            ->addPhappEnvironment($this->phappManifest)
         );
       }
     }
     return $collection;
   }
+
 
   /**
    * Invokes a manifest command defined at the app in the given directory.
@@ -232,7 +171,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     $collection->addTask(
       $this->taskExec($manifest->getCommand($command_name))
         ->dir($directory)
-        ->envVars($this->getPhappEnviromentVariables($directory, $manifest))
+        ->addPhappEnvironment($manifest)
     );
 
     return $collection;

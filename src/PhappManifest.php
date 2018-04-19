@@ -69,13 +69,13 @@ class PhappManifest {
     if (isset($directory)) {
       $file = new \SplFileInfo($directory . '/phapp.yml');
       if (!$file->isFile()) {
-        throw new PhappInstanceNotFoundException('Uanble to find phapp.yml at '. $directory);
+        throw new PhappInstanceNotFoundException('Unable to find phapp.yml at '. $directory);
       }
     }
     else {
       $file = static::discoverInstance();
       if (!$file || !$file->isFile()) {
-        throw new PhappInstanceNotFoundException($directory);
+        throw new PhappInstanceNotFoundException();
       }
     }
     $yamlParser = new Parser();
@@ -133,15 +133,6 @@ class PhappManifest {
    */
   public function getName() {
     return $this->config['name'];
-  }
-
-  /**
-   * Gets the environment variables.
-   *
-   * @return array
-   */
-  public function getEnvironment() {
-    return $this->config['environment'] ?? [];
   }
 
   /**

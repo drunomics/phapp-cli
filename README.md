@@ -71,9 +71,23 @@ for an example.
 ## Phapp environment variables
 
 Commands defined in `phapp.yml` may make use of the phapp environment
-variables. Phapp environment variables are either set by the environment; i.e.
+variables.
+
+### Dotenv support
+
+Phapp environment variables are either set by the environment; i.e.
 the host, or via a [.env](https://symfony.com/doc/current/components/dotenv.html)
 file.
+
+In order to help with initializing the environment based upon one or multiple
+.env files the `environment` command may be used. This command is prepended the
+other commands (except setup) such that they may rely on the initialized
+environment.
+
+Thus, the .env file can be written as part of the `setup` command and sourced
+as part of the `environment` command.
+
+### Available variables
 
 Available environment variables are / must be:
 
@@ -82,10 +96,16 @@ Variable | Description | Example value |
 | PHAPP_ENV       | The environment name. E.g., local, test or live | live |
 | PHAPP_ENV_TYPE  | The environment type; e.g. an id for the hosting environment or type of server. | acquia |
 | PHAPP_ENV_MODE  | The environment mode; valid values are: production, development | production |
+| PHAPP_BASE_URL  | The base URL of the app. | https://example.com |
 
-More environment variables which are pending definition:
+Optional environment variables are:
+
+Variable | Description | Example value |
+--- | --- | --- |
+| PHAPP_ENV_COLOR | A color used for indicating the current environment. | 302f2f |
 
 ### Database connection.
+
     PHAPP_ENV_MYSQL_DEFAULT_DATABASE=database
     PHAPP_ENV_MYSQL_DEFAULT_USERNAME=user
     PHAPP_ENV_MYSQL_DEFAULT_PASSWORD=pass
@@ -93,11 +113,8 @@ More environment variables which are pending definition:
     PHAPP_ENV_MYSQL_DEFAULT_PORT="3306"
 
 ### Various other variables provided by the environment.
-    PHAPP_BASE_URL=https://example.com
     PHAPP_ENV_DUMP_DIR="/data/mysql_dumps/sync"
     PHAPP_ENV_DUMP_DB_FILENAME="${PHAPP_ENV_MYSQL_DEFAULT_DATABASE}-$(date -d "1 day ago" +%Y%m%d).sql.gz"
-    PHAPP_ENV_HTTPS _ENABLED=1 (1|0)
-    PHAPP_ENV_HTTPS_REQUIRED=1 (1|0)
 
 ## Phapp development
 
