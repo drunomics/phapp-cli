@@ -8,6 +8,7 @@
 namespace drunomics\Phapp\Task;
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\PhappManifest;
+use Robo\Robo;
 use Symfony\Component\Process\Process;
 
 /**
@@ -60,8 +61,9 @@ class Exec extends \Robo\Task\Base\Exec {
    * Customizes how commands are printed.
    */
   protected function getCommandDescription() {
-    // Do not show wrapping the command in /bin/bash by default.
-    return "\n" . $this->getCommand(FALSE);
+    // Do not show wrapping the command in /bin/bash if not verbose.
+    $is_verbose = Robo::getContainer()->get('output')->isVerbose();
+    return "\n" . $this->getCommand($is_verbose);
   }
 
   /**
