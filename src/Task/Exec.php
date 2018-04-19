@@ -48,6 +48,9 @@ class Exec extends \Robo\Task\Base\Exec {
       $command = $env_command . $command ;
     }
     $process = new Process($this->ensureCommandRunsViaBash($command));
+    if ($this->workingDirectory) {
+      $process->setWorkingDirectory($this->workingDirectory);
+    }
     $exit_code = $process->run();
 
     if ($exit_code != 0) {
