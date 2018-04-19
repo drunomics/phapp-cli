@@ -71,9 +71,23 @@ for an example.
 ## Phapp environment variables
 
 Commands defined in `phapp.yml` may make use of the phapp environment
-variables. Phapp environment variables are either set by the environment; i.e.
+variables.
+
+### Dotenv support
+
+Phapp environment variables are either set by the environment; i.e.
 the host, or via a [.env](https://symfony.com/doc/current/components/dotenv.html)
 file.
+
+In order to help with initializing the environment based upon one or multiple
+.env files the `environment` command may be used. This command is prepended the
+other commands (except setup) such that they may rely on the initialized
+environment.
+
+Thus, the .env file can be written as part of the `setup` command and sourced
+as part of the `environment` command.
+
+### Available variables
 
 Available environment variables are / must be:
 
