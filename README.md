@@ -82,10 +82,16 @@ Variable | Description | Example value |
 | PHAPP_ENV       | The environment name. E.g., local, test or live | live |
 | PHAPP_ENV_TYPE  | The environment type; e.g. an id for the hosting environment or type of server. | acquia |
 | PHAPP_ENV_MODE  | The environment mode; valid values are: production, development | production |
+| PHAPP_BASE_URL  | The base URL of the app. | https://example.com |
 
-More environment variables which are pending definition:
+Optional environment variables are:
+
+Variable | Description | Example value |
+--- | --- | --- |
+| PHAPP_ENV_COLOR | A color used for indicating the current environment. | 302f2f |
 
 ### Database connection.
+
     PHAPP_ENV_MYSQL_DEFAULT_DATABASE=database
     PHAPP_ENV_MYSQL_DEFAULT_USERNAME=user
     PHAPP_ENV_MYSQL_DEFAULT_PASSWORD=pass
@@ -93,11 +99,8 @@ More environment variables which are pending definition:
     PHAPP_ENV_MYSQL_DEFAULT_PORT="3306"
 
 ### Various other variables provided by the environment.
-    PHAPP_BASE_URL=https://example.com
     PHAPP_ENV_DUMP_DIR="/data/mysql_dumps/sync"
     PHAPP_ENV_DUMP_DB_FILENAME="${PHAPP_ENV_MYSQL_DEFAULT_DATABASE}-$(date -d "1 day ago" +%Y%m%d).sql.gz"
-    PHAPP_ENV_HTTPS _ENABLED=1 (1|0)
-    PHAPP_ENV_HTTPS_REQUIRED=1 (1|0)
 
 ## Phapp development
 
