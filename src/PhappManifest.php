@@ -86,7 +86,7 @@ class PhappManifest {
   /**
    * Constructs the object.
    *
-   * @param array $config
+   * @param array $content
    *   The parsed phapp.yml file contents.
    * @param \SplFileInfo $configFile
    *   The config file info.
@@ -94,10 +94,10 @@ class PhappManifest {
    * @throws \drunomics\Phapp\Exception\PhappManifestMalformedException
    *   Thrown when validation fails.
    */
-  public function __construct(array $config, \SplFileInfo $configFile) {
+  public function __construct(array $content, \SplFileInfo $configFile) {
     $yamlParser = new Parser();
     $defaults = $yamlParser->parse(file_get_contents(__DIR__ . '/../defaults/phapp.defaults.yml'));
-    $this->content = array_replace_recursive($defaults, $config);
+    $this->content = array_replace_recursive($defaults, $content);
     $this->file = $configFile;
     $this->validate();
   }
