@@ -10,6 +10,10 @@ git:
     version_prefix: 'version/'
 sub-apps: []
 commands:
+  setup: |
+    echo PHAPP_ENV=$PHAPP_ENV > .env
+  environment: |
+    source .env
   clean: rm -rf ./vendor
   build: |
     composer install --no-dev --no-interaction

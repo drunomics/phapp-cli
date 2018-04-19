@@ -15,7 +15,7 @@ git:
     mirror1: mirror1-url
 commands:
   setup: |
-    echo $PHAPP_ENV > .env
+    echo PHAPP_ENV=$PHAPP_ENV > .env
   environment: |
     source .env
   build: |
