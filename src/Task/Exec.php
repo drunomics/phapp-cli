@@ -45,7 +45,7 @@ class Exec extends \Robo\Task\Base\Exec {
     // command.
     $command = ' [ ! -z "$PHAPP_ENV" ]';
     if ($env_command = $this->manifest->getCommand('environment')) {
-      $command = $env_command . $command ;
+      $command = trim($env_command) . ' ' . $command ;
     }
     $process = new Process($this->ensureCommandRunsViaBash($command));
     if ($this->workingDirectory) {
@@ -80,7 +80,7 @@ class Exec extends \Robo\Task\Base\Exec {
       $this->ensureValidPhappEnvironment();
 
       if ($env_command = $this->manifest->getCommand('environment')) {
-        $command = $env_command . " && " . $command;
+        $command = trim($env_command) . " && " . $command;
       }
     }
 
