@@ -74,7 +74,7 @@ class PhappManifest {
     }
     else {
       $file = static::discoverInstance();
-      if (!$file || !$file->isFile()) {
+      if (!isset($file) || !$file->isFile()) {
         throw new PhappInstanceNotFoundException();
       }
     }
