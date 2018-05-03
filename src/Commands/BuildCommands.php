@@ -290,13 +290,13 @@ class BuildCommands extends PhappCommandBase {
     // can start from with.
     $productionBranch = $this->phappManifest->getGitBranchProduction();
     $productionBuildBranch = $this->phappManifest->getGitBranchForBuild($productionBranch);
-    $process = $this->_execSilent("git log --format=oneline $productionBuildBranch --grep \"Build $productionBranch commit \"");
+    $process = $this->_execSilent("git log --format=oneline $productionBuildBranch --grep \"Build .* commit \"");
 
     if ($process->isSuccessful() && $output = $process->getOutput()) {
       // Parse the message to get the source commit hash.
       list($first_line) = explode("\n", $output, 2);
       $matches = [];
-      if (preg_match('/Build ' . $productionBranch . ' commit (\S*)./', $first_line, $matches)) {
+      if (preg_match('/Build .* commit (\S*)./', $first_line, $matches)) {
         $sourceCommit = $matches[1];
       }
     }
