@@ -15,15 +15,14 @@ class InstallCommands extends PhappCommandBase  {
   /**
    * Installs the application.
    *
-   * @option bool $build Build before running an update if the app is in
-   *   development mode.
+   * @option bool $build Build before running an update.
    *
    * @command install
    */
   public function install(array $options = ['build' => TRUE]) {
     $collection = $this->collectionBuilder();
     $collection->setProgressIndicator(NULL);
-    if (getenv('PHAPP_ENV_MODE') == 'development' && $options['build']) {
+    if ($options['build']) {
       $collection->addCode(function() {
         $this->io()->title('Building...');
       });
