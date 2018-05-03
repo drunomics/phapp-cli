@@ -142,7 +142,8 @@ class BuildCommands extends PhappCommandBase {
       );
       // Create the build branch and merge in changes.
       $task = $this->taskGitStack()
-        ->exec("checkout -b $buildBranch")
+        ->exec("branch $buildBranch $ancestorBranch")
+        ->checkout($buildBranch)
         ->exec("merge $branchEscaped --no-edit");
       $collection->addTask($task);
     }
