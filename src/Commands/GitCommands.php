@@ -169,7 +169,7 @@ class GitCommands extends PhappCommandBase  {
     foreach ($remotes as $name => $url) {
       $result = $this->_execSilent('git remote get-url ' . $name);
       if ($result->getExitCode() == 0 && trim($result->getOutput()) != trim($url)) {
-        if (!$options['force']) {
+        if (empty($options['force'])) {
           throw new LogicException("Remote $name already exists but does not point to $url. Re-run git:setup-remotes with --force to fix that.");
         }
         else {
