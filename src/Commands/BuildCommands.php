@@ -251,7 +251,7 @@ class BuildCommands extends PhappCommandBase {
       if (!$process->isSuccessful()) {
         $collection->addTask(
           $this->taskGitStack()
-            ->tag($target_tag)
+            ->tag($target_tag, "Build of tag $tag.")
         );
         $collection->completionCode(
           function() use ($target_tag) {
