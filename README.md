@@ -6,6 +6,7 @@ Provides standardized console commands for PHP applications.
 
  * Git version >= 2.0
  * Bash 4.*
+ * PHP >5.6|>7.0
 
 ## Installation
 
