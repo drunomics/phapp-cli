@@ -99,7 +99,7 @@ class CreateCommands extends PhappCommandBase {
     catch (PhappInstanceNotFoundException $e) {
       $data = [];
     }
-    $data = array_replace_recursive($data, $this->globalConfig->getPhappInitDefaults());
+    $data = array_replace_recursive($this->globalConfig->getPhappInitDefaults(), $data);
 
     // Ensure some important attributes come first.
     $new_data['name'] = $name;
