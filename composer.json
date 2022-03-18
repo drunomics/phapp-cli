@@ -9,11 +9,11 @@
     }
   ],
   "require": {
-    "consolidation/robo": "^2.0",
+    "consolidation/robo": "^3.0",
     "padraic/phar-updater": "^1.0",
-    "symfony/dotenv": "^4.0",
-    "symfony/event-dispatcher": "^4.0",
-    "symfony/yaml": "^4.0"
+    "symfony/dotenv": "^4.4",
+    "symfony/event-dispatcher": "^4.4",
+    "symfony/yaml": "^4.4"
   },
   "scripts": {
     "build": "php -d phar.readonly=0 vendor/bin/box build",
