@@ -47,7 +47,7 @@ class Exec extends \Robo\Task\Base\Exec {
     if ($env_command = $this->manifest->getCommand('environment')) {
       $command = trim($env_command) . ' ' . $command ;
     }
-    $process = new Process($this->ensureCommandRunsViaBash($command));
+    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command));
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
@@ -94,17 +94,6 @@ class Exec extends \Robo\Task\Base\Exec {
     // Be sure to run commands via the shell. We need to escapes single quotes
     // in the command!
     return '/bin/bash -c ' . escapeshellarg($command);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function execute($process, $output_callback = NULL) {
-
-    // If PHAPP_ENV etc. is already set, be sure to keep that.
-    $process->inheritEnvironmentVariables(TRUE);
-
-    return parent::execute($process, $output_callback);
   }
 
 }
