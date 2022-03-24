@@ -47,7 +47,7 @@ class CloneCommands extends PhappCommandBase {
 
     // Make sure the command output is streamed while clone a repo.
     $this->logger->info('Running ' . $command);
-    $process = new Process($command);
+    $process = Process::fromShellCommandline($command);
     $process->enableOutput()->start();
     $process->setTty(TRUE);
     $process->setTimeout(3600);

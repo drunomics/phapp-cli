@@ -6,6 +6,7 @@
  */
 
 namespace drunomics\Phapp\Task;
+
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\PhappManifest;
 use Robo\Robo;
