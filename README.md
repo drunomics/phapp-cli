@@ -31,7 +31,7 @@ To do so, just execute:
  
 ## Updating
 
-Run
+@deprecated: Run
       
      phapp self:update
      
@@ -59,9 +59,6 @@ is:
       git:setup-remotes     Configures Git remote repositories.
      init
       init:manifest         Initializes a new phapp.yml for your project.
-     self
-      self:rollback         Rolls back to the previous version after a self-update.
-      self:update           Updates the installed phar.
       
 ## phapp.yml
 

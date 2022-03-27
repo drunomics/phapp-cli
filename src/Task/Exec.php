@@ -48,7 +48,7 @@ class Exec extends \Robo\Task\Base\Exec {
     if ($env_command = $this->manifest->getCommand('environment')) {
       $command = trim($env_command) . ' ' . $command ;
     }
-    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command));
+    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command), null, ['PHAPP_ENV' => getenv('PHAPP_ENV')]);
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
