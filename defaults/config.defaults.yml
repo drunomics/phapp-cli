@@ -31,10 +31,10 @@ phapp_discovery:
   # Whether to look for projects in composer repositories.
   composer: true
   # The URL pattern used for finding projects or when creating projects.
-  git_url_pattern: git@bitbucket.org:drunomics/{{ phapp_name }}.git
+  git_url_pattern: git@github.com:drunomics/{{ phapp_name }}.git
   # The default vendor used for finding or creating projects.
   package_vendor_default: drunomics
 
 phapp_templates:
   'drunomics/php-project': 'PHP or any web project'
-  'drunomics/drupal-project': 'Drupal 8 (drunomics)'
+  'drunomics/drupal-project': 'Drupal 9 (drunomics)'
