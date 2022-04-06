@@ -29,11 +29,6 @@ To do so, just execute:
     # If you skipped the optional step above, be sure to move it to a suiting destination.
     mv phapp ~/bin/phapp
  
-## Updating
-
-@deprecated: Run
-      
-     phapp self:update
      
 ## Usage
 

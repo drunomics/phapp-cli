@@ -57,7 +57,7 @@ class Exec extends \Robo\Task\Base\Exec {
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
-    $exit_code = $process->run(env: $env);
+    $exit_code = $process->run(null, $env);
 
     if ($exit_code != 0) {
       throw new PhappEnvironmentUndefinedException();
@@ -108,7 +108,7 @@ class Exec extends \Robo\Task\Base\Exec {
   public function run() {
       $env = [];
       if ($phapp_env = getenv('PHAPP_ENV')) {
-          $env['PHAPP_ENV'] = $phapp_env;
+         $env['PHAPP_ENV'] = $phapp_env;
       }
       $this->hideProgressIndicator();
       // TODO: Symfony 4 requires that we supply the working directory.
