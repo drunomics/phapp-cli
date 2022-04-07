@@ -49,15 +49,11 @@ class Exec extends \Robo\Task\Base\Exec {
     if ($env_command = $this->manifest->getCommand('environment')) {
       $command = trim($env_command) . ' ' . $command ;
     }
-    $env = [];
-    if ($phapp_env = getenv('PHAPP_ENV')) {
-        $env['PHAPP_ENV'] = $phapp_env;
-    }
-    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command), null, $env);
+    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command), null, getenv());
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
-    $exit_code = $process->run(null, $env);
+    $exit_code = $process->run();
 
     if ($exit_code != 0) {
       throw new PhappEnvironmentUndefinedException();
@@ -106,13 +102,9 @@ class Exec extends \Robo\Task\Base\Exec {
      * {@inheritdoc}
      */
   public function run() {
-      $env = [];
-      if ($phapp_env = getenv('PHAPP_ENV')) {
-         $env['PHAPP_ENV'] = $phapp_env;
-      }
       $this->hideProgressIndicator();
       // TODO: Symfony 4 requires that we supply the working directory.
-      $result_data = $this->execute(Process::fromShellCommandline($this->getCommand(), getcwd(), $env));
+      $result_data = $this->execute(Process::fromShellCommandline($this->getCommand(), getcwd(), getenv()));
       // Same as parent but with environment variable.
       $result = new Result(
           $this,

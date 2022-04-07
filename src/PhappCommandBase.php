@@ -84,7 +84,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     // red warnings when we do not want it to AND it stops on fails!
     // Because of that we execute the command directly with the symfony process
     // helper.
-    $process = Process::fromShellCommandline($command);
+    $process = Process::fromShellCommandline($command, null, getenv());
     $process->run();
     return $process;
   }
