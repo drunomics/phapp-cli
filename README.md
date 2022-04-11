@@ -29,6 +29,11 @@ To do so, just execute:
     # If you skipped the optional step above, be sure to move it to a suiting destination.
     mv phapp ~/bin/phapp
  
+## Updating
+
+Run
+      
+     phapp self:update
      
 ## Usage
 
@@ -54,6 +59,8 @@ is:
       git:setup-remotes     Configures Git remote repositories.
      init
       init:manifest         Initializes a new phapp.yml for your project.
+     self
+      self:update           Updates the installed phar.
       
 ## phapp.yml
 
