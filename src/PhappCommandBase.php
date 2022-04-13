@@ -62,9 +62,8 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected function initShellEnvironment() {
     // Switch working directory.
     chdir($this->phappManifest->getFile()->getPath());
-    // Add the composer bin-dir to the path.
-    $path = getenv("PATH");
-    putenv("PATH=../vendor/bin/:../bin:$path");
+    // Add the composer bin-dir to the path in your manifest file.
+    // ../vendor/bin and ../bin should be in your executable path.
     return $this;
   }
 

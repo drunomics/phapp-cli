@@ -10,7 +10,6 @@ namespace drunomics\Phapp\Task;
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\PhappManifest;
 use Robo\Robo;
-use Robo\Result;
 use Symfony\Component\Process\Process;
 
 /**
@@ -45,11 +44,11 @@ class Exec extends \Robo\Task\Base\Exec {
   protected function ensureValidPhappEnvironment() {
     // Ensure the PHAPP_ENV variable will be set after running the environment
     // command.
-    $command = ' [ ! -z "$PHAPP_ENV" ]';
+    $command = ' ;[ ! -z "$PHAPP_ENV" ]';
     if ($env_command = $this->manifest->getCommand('environment')) {
       $command = trim($env_command) . ' ' . $command ;
     }
-    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command), null, getenv());
+    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command));
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
@@ -96,24 +95,6 @@ class Exec extends \Robo\Task\Base\Exec {
     // Be sure to run commands via the shell. We need to escapes single quotes
     // in the command!
     return '/bin/bash -c ' . escapeshellarg($command);
-  }
-
-    /**
-     * {@inheritdoc}
-     */
-  public function run() {
-      $this->hideProgressIndicator();
-      // TODO: Symfony 4 requires that we supply the working directory.
-      $result_data = $this->execute(Process::fromShellCommandline($this->getCommand(), getcwd(), getenv()));
-      // Same as parent but with environment variable.
-      $result = new Result(
-          $this,
-          $result_data->getExitCode(),
-          $result_data->getMessage(),
-          $result_data->getData()
-      );
-      $this->showProgressIndicator();
-      return $result;
   }
 
 }

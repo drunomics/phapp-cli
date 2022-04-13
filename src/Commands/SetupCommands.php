@@ -35,7 +35,7 @@ class SetupCommands extends PhappCommandBase  {
     // The setup command must work without a prepared environment; i.e. the
     // environment command is not yet available.
     $content = $this->phappManifest->getContent();
-    $content['commands']['environment'] = '';
+    $content['commands']['environment'] = "export PHAPP_ENV=${env}";
     $this->phappManifest = new PhappManifest($content, $this->phappManifest->getFile());
     return $this->invokeManifestCommand('setup');
   }
