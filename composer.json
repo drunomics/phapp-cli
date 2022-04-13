@@ -11,8 +11,8 @@
   "require": {
     "consolidation/robo": "^3.0",
     "consolidation/self-update": "^2.0",
-    "symfony/dotenv": "^6.0",
-    "symfony/event-dispatcher": "^6.0",
+    "symfony/dotenv": "^5.0",
+    "symfony/event-dispatcher": "^5.0",
     "symfony/yaml": "^4.4"
   },
   "scripts": {
@@ -38,6 +38,7 @@
     }
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "platform-check": false
   }
 }
