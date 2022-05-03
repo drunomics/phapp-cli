@@ -44,7 +44,7 @@ class PhappRunner extends Runner {
   /**
    * {@inheritdoc}
    */
-  public function run($input = NULL, $output = NULL, $app = NULL, $commandFiles = NULL) {
+  public function run($input = NULL, $output = NULL, $app = NULL, $commandFiles = [], $classLoader = NULL) {
     if (!$input) {
       $input = new ArgvInput($_SERVER['argv']);
     }

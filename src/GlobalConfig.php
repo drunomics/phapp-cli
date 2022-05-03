@@ -159,8 +159,7 @@ class GlobalConfig {
       $commands[] = 'composer config --global ' . escapeshellcmd($config);
     }
     if ($commands) {
-      $command = implode("\n", $commands);
-      $process = new Process($command);
+      $process = new Process($commands);
       $process->run();
       if ($process->getExitCode()) {
         throw new InvalidArgumentException("Problems settings global composer config with commands: " . $command);

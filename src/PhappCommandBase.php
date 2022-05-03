@@ -62,9 +62,8 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
   protected function initShellEnvironment() {
     // Switch working directory.
     chdir($this->phappManifest->getFile()->getPath());
-    // Add the composer bin-dir to the path.
-    $path = getenv("PATH");
-    putenv("PATH=../vendor/bin/:../bin:$path");
+    // Add the composer bin-dir to the path in your manifest file.
+    // ../vendor/bin and ../bin should be in your executable path.
     return $this;
   }
 
@@ -84,7 +83,7 @@ abstract class PhappCommandBase extends Tasks implements LoggerAwareInterface {
     // red warnings when we do not want it to AND it stops on fails!
     // Because of that we execute the command directly with the symfony process
     // helper.
-    $process = new Process($command);
+    $process = Process::fromShellCommandline($command, null, getenv());
     $process->run();
     return $process;
   }

@@ -6,6 +6,7 @@
  */
 
 namespace drunomics\Phapp\Task;
+
 use drunomics\Phapp\Exception\PhappEnvironmentUndefinedException;
 use drunomics\Phapp\PhappManifest;
 use Robo\Robo;
@@ -43,11 +44,11 @@ class Exec extends \Robo\Task\Base\Exec {
   protected function ensureValidPhappEnvironment() {
     // Ensure the PHAPP_ENV variable will be set after running the environment
     // command.
-    $command = ' [ ! -z "$PHAPP_ENV" ]';
+    $command = ' ;[ ! -z "$PHAPP_ENV" ]';
     if ($env_command = $this->manifest->getCommand('environment')) {
       $command = trim($env_command) . ' ' . $command ;
     }
-    $process = new Process($this->ensureCommandRunsViaBash($command));
+    $process = Process::fromShellCommandline($this->ensureCommandRunsViaBash($command));
     if ($this->workingDirectory) {
       $process->setWorkingDirectory($this->workingDirectory);
     }
@@ -94,17 +95,6 @@ class Exec extends \Robo\Task\Base\Exec {
     // Be sure to run commands via the shell. We need to escapes single quotes
     // in the command!
     return '/bin/bash -c ' . escapeshellarg($command);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function execute($process, $output_callback = NULL) {
-
-    // If PHAPP_ENV etc. is already set, be sure to keep that.
-    $process->inheritEnvironmentVariables(TRUE);
-
-    return parent::execute($process, $output_callback);
   }
 
 }

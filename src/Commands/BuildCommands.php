@@ -21,7 +21,7 @@ class BuildCommands extends PhappCommandBase {
    * @option $clean Allows starting the build from a clean state. If specified,
    *   any previously installed composer dependencies are removed.
    *
-   * @return \Robo\Collection\Collection
+   * @return \Robo\Collection\CollectionBuilder
    *
    * @command build
    */
