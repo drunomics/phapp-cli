@@ -13,7 +13,8 @@
     "consolidation/self-update": "^2.0",
     "symfony/dotenv": "^5.0",
     "symfony/event-dispatcher": "^5.0",
-    "symfony/yaml": "^4.4"
+    "symfony/yaml": "^4.4",
+    "php": ">=7.4"
   },
   "scripts": {
     "build": "php -d phar.readonly=0 vendor/bin/box build",
@@ -40,5 +41,8 @@
   "config": {
     "sort-packages": true,
     "platform-check": false
+  },
+  "require-dev": {
+    "phpcompatibility/php-compatibility": "^9.3"
   }
 }
