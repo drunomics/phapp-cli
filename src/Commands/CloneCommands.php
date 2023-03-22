@@ -43,7 +43,7 @@ class CloneCommands extends PhappCommandBase {
       $target = $this->globalConfig->getDefaultDirectoryPath($name);
     }
     $args = isset($options['branch']) ? ' --branch='. $options['branch'] : '';
-    $command = "git clone ${options['repository']} $target" . $args;
+    $command = "git clone {$options['repository']} $target" . $args;
 
     // Make sure the command output is streamed while clone a repo.
     $this->logger->info('Running ' . $command);
