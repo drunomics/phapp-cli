@@ -9,8 +9,10 @@
     }
   ],
   "require": {
-    "consolidation/robo": "^3.0",
+    "php": ">=7.4",
+    "consolidation/robo": "~3",
     "consolidation/self-update": "^2.0",
+    "cweagans/composer-patches": "^1.7",
     "symfony/dotenv": "^5.0",
     "symfony/event-dispatcher": "^5.0",
     "symfony/yaml": "^4.4"
@@ -35,10 +37,23 @@
       "box": {
         "url": "https://github.com/box-project/box2/releases/download/2.7.5/box-2.7.5.phar"
       }
+    },
+    "enable-patching": true,
+    "composer-exit-on-patch-failure": true,
+    "patches": {
+      "consolidation/robo": {
+        "php82 compatibility": "https://gist.githubusercontent.com/ivangrozni/3e7cf601609e9dacf6cb5ec314127660/raw/66a00f1241d10dad5de93a2e9463de09c80184aa/gistfile1.txt"
+      }
     }
   },
   "config": {
     "sort-packages": true,
-    "platform-check": false
+    "platform-check": false,
+    "allow-plugins": {
+      "cweagans/composer-patches": true
+    }
+  },
+  "require-dev": {
+    "phpcompatibility/php-compatibility": "^9.3"
   }
 }
