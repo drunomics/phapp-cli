@@ -17,6 +17,7 @@ elseif (file_exists(__DIR__.'/../../autoload.php')) {
   require_once __DIR__ . '/../../autoload.php';
 }
 
+var_dump('first run');
 $application = new \Robo\Application('phapp','@package_version@');
 $runner = new \drunomics\Phapp\PhappRunner();
 $statusCode = $runner->run(NULL, NULL, $application);

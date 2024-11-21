@@ -101,7 +101,7 @@ class GitCommands extends PhappCommandBase  {
 
     // Take care of build branches.
     foreach ($this->phappManifest->getGitBuildRepositories() as $name => $url) {
-      if (!($options['remote'] == 'all' || (isset($remotes[$options['remote']]) && $remotes[$options['remote']] == $url))) {
+      if (!($options['remote'] == 'all')) {
         continue;
       }
       $build_branch = $this->phappManifest->getGitBranchForBuild($branch);

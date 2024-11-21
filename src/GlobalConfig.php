@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Provides system-wide configuration.
  */
-class GlobalConfig {
+final class GlobalConfig {
 
   /**
    * The content of the config file.
