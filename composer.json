@@ -10,12 +10,12 @@
   ],
   "require": {
     "php": ">=7.4",
-    "consolidation/robo": "^4",
+    "consolidation/robo": "^5",
     "consolidation/self-update": "^2.0",
     "cweagans/composer-patches": "^1.7",
-    "symfony/dotenv": "^5.0",
-    "symfony/event-dispatcher": "^5.0",
-    "symfony/yaml": "^5"
+    "symfony/dotenv": "^7",
+    "symfony/event-dispatcher": "^7",
+    "symfony/yaml": "^6"
   },
   "scripts": {
     "build": "php -d phar.readonly=0 vendor/bin/box build",
@@ -42,7 +42,6 @@
     "composer-exit-on-patch-failure": true,
     "patches": {
       "consolidation/robo": {
-        "php82 compatibility": "https://gist.githubusercontent.com/ivangrozni/3e7cf601609e9dacf6cb5ec314127660/raw/66a00f1241d10dad5de93a2e9463de09c80184aa/gistfile1.txt"
       }
     }
   },
