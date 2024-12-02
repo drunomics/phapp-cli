@@ -18,7 +18,7 @@
     "symfony/yaml": "^6"
   },
   "scripts": {
-    "build": "php -d phar.readonly=0 vendor/bin/box build",
+    "build": "php -d phar.readonly=0 vendor/bin/box compile",
     "clean-git": "find vendor/ -name \\.git | xargs rm -rf",
     "remove-test": "find vendor/ -name [tT]ests | xargs rm -rf",
     "post-install-cmd": "drunomics\\Phapp\\ScriptHandler::installPharTools",
