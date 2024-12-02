@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Provides information about a local phapp instance.
  */
-class PhappManifest {
+final class PhappManifest {
 
   /**
    * Information about the manifest file.
