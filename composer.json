@@ -35,7 +35,7 @@
     },
     "tools": {
       "box": {
-        "url": "https://github.com/box-project/box/releases/download/4.6.1/box.phar"
+        "url": "https://github.com/box-project/box/releases/download/4.7.0/box.phar"
       }
     },
     "enable-patching": true,
