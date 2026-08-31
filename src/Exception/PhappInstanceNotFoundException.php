@@ -10,7 +10,7 @@ class PhappInstanceNotFoundException extends \Exception {
   /**
    * {@inheritdoc}
    */
-  public function __construct($message = 'Unable to find a phapp.yml file in the current working directory or Git project.', $code = 0, \Exception $previous = NULL) {
+  public function __construct($message = 'Unable to find a phapp.yml file in the current working directory or Git project.', $code = 0, ?\Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
   }
 
