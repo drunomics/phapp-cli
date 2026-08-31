@@ -123,7 +123,7 @@ Variable | Description | Example value |
 The phar is built using box, for details see
 https://github.com/box-project/box. To built the phar just run:
 
-     composer install --dev
+     composer install
      composer build
 
 ### Create a new release
